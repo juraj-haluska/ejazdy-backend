@@ -1,11 +1,13 @@
-package net.spacive.apps.ejazdybackend.security;
+package net.spacive.apps.ejazdybackend.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 @ConfigurationProperties(prefix = "cognito")
-public class CognitoConfigurationProperties {
+public class CognitoConfiguration {
 
     private String issuer;
     private String keyStorePath;

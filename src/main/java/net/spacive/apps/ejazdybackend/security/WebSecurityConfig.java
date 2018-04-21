@@ -1,5 +1,6 @@
 package net.spacive.apps.ejazdybackend.security;
 
+import net.spacive.apps.ejazdybackend.config.CognitoConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -14,13 +15,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@EnableConfigurationProperties(CognitoConfigurationProperties.class)
+@EnableConfigurationProperties(CognitoConfiguration.class)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    final CognitoConfigurationProperties properties;
+    final CognitoConfiguration properties;
 
     @Autowired
-    public WebSecurityConfig(CognitoConfigurationProperties properties) {
+    public WebSecurityConfig(CognitoConfiguration properties) {
         this.properties = properties;
     }
 

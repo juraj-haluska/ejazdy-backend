@@ -11,6 +11,8 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
+import net.spacive.apps.ejazdybackend.config.CognitoConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -35,12 +37,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private static final String AUTH_BEARER_STRING = "Bearer";
     private static final String COGNITO_GROUP_CLAIM = "cognito:groups";
 
-    private final CognitoConfigurationProperties properties;
+    @Autowired
+    private final CognitoConfiguration properties;
 
     // should cache keys
     RemoteJWKSet remoteJWKSet;
 
-    public JwtAuthFilter(CognitoConfigurationProperties properties) throws MalformedURLException {
+    public JwtAuthFilter(CognitoConfiguration properties) throws MalformedURLException {
         URL JWKUrl = new URL(properties.getIssuer() + properties.getKeyStorePath());
         this.remoteJWKSet = new RemoteJWKSet(JWKUrl);
         this.properties = properties;
