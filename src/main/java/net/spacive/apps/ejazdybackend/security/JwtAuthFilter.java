@@ -17,8 +17,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -31,18 +33,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private static final String AUTH_HEADER_STRING = "Authorization";
     private static final String AUTH_BEARER_STRING = "Bearer";
     private static final String COGNITO_GROUP_CLAIM = "cognito:groups";
 
-    @Autowired
-    private final CognitoConfiguration properties;
+    private CognitoConfiguration properties;
 
     // should cache keys
     RemoteJWKSet remoteJWKSet;
 
+    @Autowired
     public JwtAuthFilter(CognitoConfiguration properties) throws MalformedURLException {
         URL JWKUrl = new URL(properties.getIssuer() + properties.getKeyStorePath());
         this.remoteJWKSet = new RemoteJWKSet(JWKUrl);

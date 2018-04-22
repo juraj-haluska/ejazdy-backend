@@ -15,20 +15,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@EnableConfigurationProperties(CognitoConfiguration.class)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    final CognitoConfiguration properties;
-
     @Autowired
-    public WebSecurityConfig(CognitoConfiguration properties) {
-        this.properties = properties;
-    }
-
-    @Bean
-    public JwtAuthFilter authTokenFilterBean() throws Exception {
-        return new JwtAuthFilter(properties);
-    }
+    private JwtAuthFilter jwtAuthFilter;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -38,6 +28,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilterBefore(authTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
     }
 }
