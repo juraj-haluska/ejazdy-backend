@@ -1,9 +1,16 @@
 package net.spacive.apps.ejazdybackend.model.entity;
 
-public abstract class UserAbstractEntity {
+public class UserEntity {
+
+    public enum UserType {
+        STUDENT,
+        INSTRUCTOR
+    }
+
     private String id;
     private String phone;
     private String email;
+    private UserType userType;
 
     public String getId() {
         return id;
@@ -27,5 +34,13 @@ public abstract class UserAbstractEntity {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
     }
 }
