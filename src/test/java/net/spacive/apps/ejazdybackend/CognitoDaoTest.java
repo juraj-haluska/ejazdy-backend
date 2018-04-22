@@ -22,7 +22,7 @@ public class CognitoDaoTest {
 
     @Test
     public void test() {
-        UserEntity invitedUser = cognitoDao.inviteUser("shanelle.karthika@itis0k.com");
+        UserEntity invitedUser = cognitoDao.inviteUser("leilarose.annaliyah@itis0k.com");
 
         log.info("invited user: " + invitedUser.getEmail());
 
