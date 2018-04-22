@@ -1,5 +1,6 @@
 package net.spacive.apps.ejazdybackend.config;
 
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -15,12 +16,21 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "cognito")
 public class CognitoConfiguration {
 
+    private String poolId;
     private String issuer;
     private String keyStorePath;
     private Map<String, String> groupRole;
     private String accessKey;
     private String secretKey;
     private String region;
+
+    public String getPoolId() {
+        return poolId;
+    }
+
+    public void setPoolId(String poolId) {
+        this.poolId = poolId;
+    }
 
     public String getIssuer() {
         return issuer;
@@ -78,13 +88,11 @@ public class CognitoConfiguration {
                 secretKey
         );
 
-        AWSCognitoIdentityProvider provider = AWSCognitoIdentityProviderClientBuilder.standard()
+        return AWSCognitoIdentityProviderClientBuilder.standard()
                 .withCredentials(
                         new AWSStaticCredentialsProvider(credentials)
                 )
                 .withRegion(region)
                 .build();
-
-        return provider;
     }
 }
