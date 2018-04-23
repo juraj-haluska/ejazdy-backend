@@ -19,13 +19,14 @@ public class LessonService {
     private CognitoService cognitoService;
 
     // TODO return new lesson or throw exception
-    public void createLessonByInstructor(CognitoUser instructor, String startTime, String stopTime) {
+    public Lesson createLessonByInstructor(CognitoUser instructor, String startTime, String stopTime) {
         final Lesson newLesson = new Lesson()
                 .withInstructorId(instructor.getId())
                 .withStartTime(startTime)
                 .withStopTime(stopTime);
 
         dynamoDao.createLesson(newLesson);
+        return newLesson;
     }
 
     public Lesson registerStudentToLesson(CognitoUser student, Lesson lesson) throws Exception {
@@ -59,6 +60,15 @@ public class LessonService {
             );
             studentsLessons.addAll(lessons);
         });
+
+        return studentsLessons;
+    }
+
+    public List<Lesson> getLessonsByStudent(CognitoUser student, CognitoUser instructor) {
+        List<Lesson> studentsLessons = dynamoDao.getLessonsByStudent(
+                instructor.getId(),
+                student.getId()
+        );
 
         return studentsLessons;
     }
