@@ -1,11 +1,11 @@
-package net.spacive.apps.ejazdybackend.model.entity;
+package net.spacive.apps.ejazdybackend.model;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
 
 import java.util.Objects;
 
 @DynamoDBTable(tableName="Lesson")
-public class LessonEntity {
+public class Lesson {
 
     private String instructorId;
     private String startTime;
@@ -47,22 +47,22 @@ public class LessonEntity {
         this.stopTime = stopTime;
     }
 
-    public LessonEntity withInstructorId(String instructorId) {
+    public Lesson withInstructorId(String instructorId) {
         this.instructorId = instructorId;
         return this;
     }
 
-    public LessonEntity withStudentId(String studentId) {
+    public Lesson withStudentId(String studentId) {
         this.studentId = studentId;
         return this;
     }
 
-    public LessonEntity withStartTime(String startTime) {
+    public Lesson withStartTime(String startTime) {
         this.startTime = startTime;
         return this;
     }
 
-    public LessonEntity withStopTime(String stopTime) {
+    public Lesson withStopTime(String stopTime) {
         this.stopTime = stopTime;
         return this;
     }
@@ -71,7 +71,7 @@ public class LessonEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LessonEntity that = (LessonEntity) o;
+        Lesson that = (Lesson) o;
         return Objects.equals(instructorId, that.instructorId) &&
                 Objects.equals(startTime, that.startTime) &&
                 Objects.equals(stopTime, that.stopTime) &&

@@ -1,21 +1,21 @@
-package net.spacive.apps.ejazdybackend.dao;
+package net.spacive.apps.ejazdybackend.service;
 
 import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProvider;
 import com.amazonaws.services.cognitoidp.model.*;
 import net.spacive.apps.ejazdybackend.config.CognitoConfiguration;
-import net.spacive.apps.ejazdybackend.model.entity.UserEntity;
+import net.spacive.apps.ejazdybackend.model.CognitoUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Repository
-public class CognitoDao {
+@Service
+public class CognitoService {
 
-    private static final Logger log = LoggerFactory.getLogger(CognitoDao.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(CognitoService.class.getName());
 
     @Autowired
     private AWSCognitoIdentityProvider cognito;
@@ -23,25 +23,24 @@ public class CognitoDao {
     @Autowired
     private CognitoConfiguration config;
 
-    public List<UserEntity> getAllInstructors() {
+    public List<CognitoUser> getUsersInGroup(String userGroup) {
 
         ListUsersInGroupRequest request = new ListUsersInGroupRequest()
-                .withGroupName("instructor")
+                .withGroupName(userGroup)
                 .withUserPoolId(config.getPoolId());
 
         List<UserType> users = cognito.listUsersInGroup(request).getUsers();
-        List<UserEntity> instructors = new ArrayList<>(users.size());
+        List<CognitoUser> cognitoUsers = new ArrayList<>(users.size());
 
         users.forEach(user -> {
-            UserEntity userEntity = userTypeToUserEntity(user);
-            userEntity.setUserType(UserEntity.UserType.INSTRUCTOR);
-            instructors.add(userEntity);
+            CognitoUser cognitoUser = userTypeToCognitoUser(user, userGroup);
+            cognitoUsers.add(cognitoUser);
         });
 
-        return instructors;
+        return cognitoUsers;
     }
 
-    public UserEntity inviteUser(String email) {
+    public CognitoUser inviteUser(String email) {
 
         final List<AttributeType> userAttributes = new ArrayList<>();
         userAttributes.add(
@@ -61,48 +60,52 @@ public class CognitoDao {
                 .withUserAttributes(userAttributes)
                 .withDesiredDeliveryMediums("EMAIL");
 
-        AdminCreateUserResult result = cognito.adminCreateUser(request);
 
-        if (result.getSdkHttpMetadata().getHttpStatusCode() == 200) {
-            UserEntity userEntity = userTypeToUserEntity(result.getUser());
-            return userEntity;
-        }
-        return null;
+        AdminCreateUserResult result = cognito.adminCreateUser(request);
+        return userTypeToCognitoUser(result.getUser(), null);
     }
 
-    public void addUserToGroup(UserEntity userEntity, String group) {
+    public CognitoUser addUserToGroup(CognitoUser cognitoUser, String group) {
 
         AdminAddUserToGroupRequest request = new AdminAddUserToGroupRequest()
                 .withGroupName(group)
-                .withUsername(userEntity.getId())
+                .withUsername(cognitoUser.getId())
                 .withUserPoolId(config.getPoolId());
 
         cognito.adminAddUserToGroup(request);
+
+        return new CognitoUser.Builder()
+                .withId(cognitoUser.getId())
+                .withEmail(cognitoUser.getEmail())
+                .withPhone(cognitoUser.getPhone())
+                .withUserGroup(group)
+                .build();
     }
 
-
-    private UserEntity userTypeToUserEntity(UserType user) {
-        final UserEntity userEntity = new UserEntity();
+    private CognitoUser userTypeToCognitoUser(UserType user, String userGroup) {
+        final CognitoUser.Builder builder = new CognitoUser.Builder();
 
         // process attributes
         user.getAttributes().forEach(attr -> {
             String attrName = attr.getName();
             switch (attrName) {
                 case "sub": {
-                    userEntity.setId(attr.getValue());
+                    builder.withId(attr.getValue());
                 }
                 break;
                 case "email": {
-                    userEntity.setEmail(attr.getValue());
+                    builder.withEmail(attr.getValue());
                 }
                 break;
                 case "phone_number": {
-                    userEntity.setPhone(attr.getValue());
+                    builder.withPhone(attr.getValue());
                 }
                 break;
             }
         });
 
-        return userEntity;
+        builder.withUserGroup(userGroup);
+
+        return builder.build();
     }
 }

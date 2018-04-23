@@ -1,7 +1,7 @@
 package net.spacive.apps.ejazdybackend;
 
-import net.spacive.apps.ejazdybackend.dao.DynamoDao;
-import net.spacive.apps.ejazdybackend.model.entity.LessonEntity;
+import net.spacive.apps.ejazdybackend.database.DynamoDao;
+import net.spacive.apps.ejazdybackend.model.Lesson;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,7 +30,7 @@ public class DynamoDaoTest {
         final String instructor = UUID.randomUUID().toString();
         final String startTime = Calendar.getInstance().toString();
 
-        LessonEntity newLesson = new LessonEntity()
+        Lesson newLesson = new Lesson()
                 .withInstructorId(instructor)
                 .withStartTime(startTime);
 
@@ -38,8 +38,8 @@ public class DynamoDaoTest {
 
         boolean contains = false;
 
-        List<LessonEntity> fetchedLessons = dynamoDao.getLessonsByInstructor(instructor);
-        for (LessonEntity lesson: fetchedLessons) {
+        List<Lesson> fetchedLessons = dynamoDao.getLessonsByInstructor(instructor);
+        for (Lesson lesson: fetchedLessons) {
             if (lesson.equals(newLesson)) {
                 contains = true;
             }
@@ -52,7 +52,7 @@ public class DynamoDaoTest {
         contains = false;
 
         fetchedLessons = dynamoDao.getLessonsByInstructor(instructor);
-        for (LessonEntity lesson: fetchedLessons) {
+        for (Lesson lesson: fetchedLessons) {
             if (lesson.equals(newLesson)) {
                 contains = true;
             }
@@ -68,13 +68,13 @@ public class DynamoDaoTest {
         final String student = UUID.randomUUID().toString();
         final String startTime = Calendar.getInstance().toString();
 
-        LessonEntity newLesson = new LessonEntity()
+        Lesson newLesson = new Lesson()
                 .withInstructorId(instructor)
                 .withStartTime(startTime);
 
         dynamoDao.createLesson(newLesson);
 
-        LessonEntity toUpdateLesson = new LessonEntity()
+        Lesson toUpdateLesson = new Lesson()
                 .withInstructorId(instructor)
                 .withStartTime(startTime)
                 .withStopTime(startTime)
@@ -82,7 +82,7 @@ public class DynamoDaoTest {
 
         dynamoDao.updateLesson(toUpdateLesson);
 
-        List<LessonEntity> studentLessons = dynamoDao.getLessonsByStudent(
+        List<Lesson> studentLessons = dynamoDao.getLessonsByStudent(
                 instructor,
                 student
         );
@@ -92,8 +92,8 @@ public class DynamoDaoTest {
 
         boolean containsUpdated = false;
 
-        List<LessonEntity> instructorLessons = dynamoDao.getLessonsByInstructor(instructor);
-        for (LessonEntity lesson: instructorLessons) {
+        List<Lesson> instructorLessons = dynamoDao.getLessonsByInstructor(instructor);
+        for (Lesson lesson: instructorLessons) {
             if (lesson.equals(toUpdateLesson)) {
                 containsUpdated = true;
             }

@@ -1,6 +1,5 @@
 package net.spacive.apps.ejazdybackend.config;
 
-import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -48,7 +47,7 @@ public class CognitoConfiguration {
         this.keyStorePath = keyStorePath;
     }
 
-    public Map<String, String> getGroupRole() {
+    public Map<String, String> getGroupRoleMap() {
         return groupRole;
     }
 
