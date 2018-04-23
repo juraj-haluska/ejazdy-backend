@@ -67,12 +67,88 @@ public class LessonServiceTest {
         Assert.assertNotNull(deletedLesson);
     }
 
+    @Test
+    public void registerStudentToLesson() throws Exception {
+        CognitoUser instructor = createRandomInstructor();
+        CognitoUser student = createRandomStudent();
+
+        // create lesson
+        Lesson createdLesson = lessonService.createLessonByInstructor(
+                instructor,
+                "123",
+                "321"
+        );
+
+        // register student to lesson
+        Lesson registeredLesson;
+        try {
+            registeredLesson = lessonService.registerStudentToLesson(student, createdLesson);
+        } catch (Exception e) {
+            e.printStackTrace();
+            registeredLesson = null;
+        }
+
+        Assert.assertNotNull(registeredLesson);
+        Assert.assertEquals(registeredLesson.getStudentId(), student.getId());
+
+        Lesson studentLesson = null;
+        for(Lesson lesson: lessonService.getLessonsByStudent(student, instructor)) {
+            if (lesson.equals(registeredLesson)) {
+                studentLesson = lesson;
+            }
+        }
+
+        Assert.assertNotNull(studentLesson);
+        Assert.assertEquals(studentLesson, registeredLesson);
+
+        // cleanup
+        lessonService.deleteLessonByInstructor(instructor, createdLesson);
+    }
+
+    @Test
+    public void unregisterStudentFromLesson() throws Exception {
+        CognitoUser instructor = createRandomInstructor();
+        CognitoUser student = createRandomStudent();
+
+        // create lesson
+        Lesson createdLesson = lessonService.createLessonByInstructor(
+                instructor,
+                "123",
+                "321"
+        );
+
+        // register student to lesson
+        Lesson registeredLesson = lessonService.registerStudentToLesson(student, createdLesson);
+
+        Lesson unregisteredLesson;
+        try {
+            unregisteredLesson = lessonService.unregisterStudentFromLesson(registeredLesson);
+        } catch (Exception e) {
+            e.printStackTrace();
+            unregisteredLesson = null;
+        }
+
+        Assert.assertNotNull(unregisteredLesson);
+
+        // cleanup
+        lessonService.deleteLessonByInstructor(instructor, createdLesson);
+    }
+
     private CognitoUser createRandomInstructor() {
         return new CognitoUser.Builder()
                 .withId(UUID.randomUUID().toString())
                 .withEmail("test@test.test")
                 .withPhone("112")
                 .withUserGroup("instructor")
+                .build();
+    }
+
+    private CognitoUser createRandomStudent() {
+        return new CognitoUser.Builder()
+                .withId(UUID.randomUUID().toString())
+                .withEmail("test@test.test")
+                .withPhone("123")
+                .withUserGroup("student")
                 .build();
     }
 }
