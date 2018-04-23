@@ -70,7 +70,7 @@ public class LessonService {
     public Lesson deleteLessonByInstructor(CognitoUser instructor, Lesson lesson) throws Exception {
         checkInstructorId(lesson);
 
-        if (instructor.getId() != lesson.getInstructorId()) {
+        if (!instructor.getId().equals(lesson.getInstructorId())) {
             throw new Exception("lesson has to belong to invoking instructor");
         }
 
@@ -79,13 +79,13 @@ public class LessonService {
     }
 
     private void checkInstructorId(Lesson lesson) throws Exception {
-        if (lesson.getInstructorId() == null || lesson.getInstructorId().length() > 0) {
+        if (lesson.getInstructorId() == null || lesson.getInstructorId().length() == 0) {
             throw new Exception("Lesson object does not contain instructorId");
         }
     }
 
     private void checkStudentId(Lesson lesson) throws Exception {
-        if (lesson.getStudentId() == null || lesson.getStudentId().length() > 0) {
+        if (lesson.getStudentId() == null || lesson.getStudentId().length() == 0) {
             throw new Exception("Lesson object does not contain studentId");
         }
     }
