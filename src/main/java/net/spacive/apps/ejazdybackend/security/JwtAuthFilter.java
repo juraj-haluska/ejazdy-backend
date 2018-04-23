@@ -12,11 +12,13 @@ import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 import net.spacive.apps.ejazdybackend.config.CognitoConfiguration;
+import net.spacive.apps.ejazdybackend.model.CognitoUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -31,18 +33,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private static final String AUTH_HEADER_STRING = "Authorization";
     private static final String AUTH_BEARER_STRING = "Bearer";
     private static final String COGNITO_GROUP_CLAIM = "cognito:groups";
 
-    @Autowired
-    private final CognitoConfiguration properties;
+    private CognitoConfiguration properties;
 
     // should cache keys
     RemoteJWKSet remoteJWKSet;
 
+    @Autowired
     public JwtAuthFilter(CognitoConfiguration properties) throws MalformedURLException {
         URL JWKUrl = new URL(properties.getIssuer() + properties.getKeyStorePath());
         this.remoteJWKSet = new RemoteJWKSet(JWKUrl);
@@ -77,19 +80,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
                 groups.forEach(group -> {
                     authorities.add(new SimpleGrantedAuthority(
-                            properties.getGroupRole().get(group)
+                            properties.getGroupRoleMap().get(group)
                     ));
                 });
 
                 // process other claims
-                UUID userUUID = UUID.fromString(claimsSet.getSubject());
-
-                UserToken userToken = new UserToken.Builder()
-                        .withUuid(userUUID)
+                final CognitoUser cognitoUser = new CognitoUser.Builder()
+                        .withId(claimsSet.getSubject())
+                        .withEmail((String) claimsSet.getClaim("email"))
+                        .withPhone((String) claimsSet.getClaim("phone_number"))
+                        .withUserGroup(groups.get(0))   // group with highest precedence
                         .build();
 
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        userToken,
+                        cognitoUser,
                         null,
                         authorities
                 );
