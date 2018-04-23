@@ -1,7 +1,6 @@
 package net.spacive.apps.ejazdybackend;
 
 import net.spacive.apps.ejazdybackend.service.CognitoService;
-import net.spacive.apps.ejazdybackend.database.DynamoDao;
 import net.spacive.apps.ejazdybackend.model.CognitoUser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +16,7 @@ import java.util.List;
 @SpringBootTest
 public class CognitoServiceTest {
 
-    private static final Logger log = LoggerFactory.getLogger(DynamoDao.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(CognitoServiceTest.class.getName());
 
     @Autowired
     private CognitoService cognitoService;
