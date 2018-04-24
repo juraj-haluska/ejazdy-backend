@@ -6,7 +6,6 @@ import net.spacive.apps.ejazdybackend.model.Lesson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -38,6 +37,7 @@ public class LessonService {
 
     public Lesson unregisterStudentFromLesson(Lesson lesson) throws Exception {
         // TODO check if the time is 24h before the actual lesson
+        // only in case of the student, maybe with param - force?
         checkStudentId(lesson);
         lesson.setStudentId(null);
         dynamoDao.updateLesson(lesson);
@@ -52,13 +52,8 @@ public class LessonService {
         return dynamoDao.getLessonsByInstructor(instructor.getId());
     }
 
-    public Lesson deleteLessonByInstructor(CognitoUser instructor, Lesson lesson) throws Exception {
+    public Lesson deleteLesson(Lesson lesson) throws Exception {
         checkInstructorId(lesson);
-
-        if (!instructor.getId().equals(lesson.getInstructorId())) {
-            throw new Exception("lesson has to belong to invoking instructor");
-        }
-
         dynamoDao.deleteLesson(lesson);
         return lesson;
     }

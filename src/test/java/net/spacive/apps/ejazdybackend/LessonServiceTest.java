@@ -55,8 +55,7 @@ public class LessonServiceTest {
         // delete lesson
         Lesson deletedLesson;
         try {
-            deletedLesson = lessonService.deleteLessonByInstructor(
-                    instructor,
+            deletedLesson = lessonService.deleteLesson(
                     newLesson
             );
         } catch (Exception e) {
@@ -102,7 +101,7 @@ public class LessonServiceTest {
         Assert.assertEquals(studentLesson, registeredLesson);
 
         // cleanup
-        lessonService.deleteLessonByInstructor(instructor, createdLesson);
+        lessonService.deleteLesson(createdLesson);
     }
 
     @Test
@@ -131,7 +130,7 @@ public class LessonServiceTest {
         Assert.assertNotNull(unregisteredLesson);
 
         // cleanup
-        lessonService.deleteLessonByInstructor(instructor, createdLesson);
+        lessonService.deleteLesson(createdLesson);
     }
 
     private CognitoUser createRandomInstructor() {
