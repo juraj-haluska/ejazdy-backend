@@ -29,18 +29,13 @@ public class DynamoDao {
         return dbMapper.query(Lesson.class, queryExpression);
     }
 
-    public List<Lesson> getLessonsByStudent(String instructorId, String studentId) {
+    public List<Lesson> getLessonsByStudent(String studentId) {
         final DynamoDBQueryExpression<Lesson> queryExpression =
                 new DynamoDBQueryExpression<Lesson>()
                         .withHashKeyValues(
-                                new Lesson().withInstructorId(instructorId)
+                                new Lesson().withStudentId(studentId)
                         )
-                        .withRangeKeyCondition(
-                                "studentId",
-                                new Condition()
-                                        .withComparisonOperator(ComparisonOperator.EQ)
-                                        .withAttributeValueList(new AttributeValue().withS(studentId))
-                        );
+                        .withConsistentRead(false);
 
         return dbMapper.query(Lesson.class, queryExpression);
     }

@@ -92,7 +92,7 @@ public class LessonServiceTest {
         Assert.assertEquals(registeredLesson.getStudentId(), student.getId());
 
         Lesson studentLesson = null;
-        for(Lesson lesson: lessonService.getLessonsByStudent(student, instructor)) {
+        for(Lesson lesson: lessonService.getLessonsByStudent(student)) {
             if (lesson.equals(registeredLesson)) {
                 studentLesson = lesson;
             }

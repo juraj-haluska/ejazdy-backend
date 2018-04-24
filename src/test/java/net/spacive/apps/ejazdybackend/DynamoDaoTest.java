@@ -83,7 +83,6 @@ public class DynamoDaoTest {
         dynamoDao.updateLesson(toUpdateLesson);
 
         List<Lesson> studentLessons = dynamoDao.getLessonsByStudent(
-                instructor,
                 student
         );
 

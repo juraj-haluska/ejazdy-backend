@@ -21,6 +21,7 @@ public class Lesson {
     }
 
     @DynamoDBRangeKey
+    @DynamoDBIndexRangeKey(globalSecondaryIndexName = "StudentIdStartTime")
     public String getStartTime() {
         return startTime;
     }
@@ -29,7 +30,7 @@ public class Lesson {
         this.startTime = startTime;
     }
 
-    @DynamoDBIndexRangeKey(localSecondaryIndexName = "InstructorStudent")
+    @DynamoDBIndexHashKey(globalSecondaryIndexName = "StudentIdStartTime")
     public String getStudentId() {
         return studentId;
     }
@@ -76,5 +77,15 @@ public class Lesson {
                 Objects.equals(startTime, that.startTime) &&
                 Objects.equals(stopTime, that.stopTime) &&
                 Objects.equals(studentId, that.studentId);
+    }
+
+    @Override
+    public String toString() {
+        return "Lesson{" +
+                "instructorId='" + instructorId + '\'' +
+                ", startTime='" + startTime + '\'' +
+                ", stopTime='" + stopTime + '\'' +
+                ", studentId='" + studentId + '\'' +
+                '}';
     }
 }

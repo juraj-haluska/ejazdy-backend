@@ -45,32 +45,7 @@ public class LessonService {
     }
 
     public List<Lesson> getLessonsByStudent(CognitoUser student) {
-
-        // not the best approach
-        // TODO new index for this in dynamo?
-
-        List<Lesson> studentsLessons = new ArrayList<>();
-
-        List<CognitoUser> instructors = cognitoService.getUsersInGroup("instructor");
-
-        instructors.forEach(instructor -> {
-            List<Lesson> lessons = dynamoDao.getLessonsByStudent(
-                    instructor.getId(),
-                    student.getId()
-            );
-            studentsLessons.addAll(lessons);
-        });
-
-        return studentsLessons;
-    }
-
-    public List<Lesson> getLessonsByStudent(CognitoUser student, CognitoUser instructor) {
-        List<Lesson> studentsLessons = dynamoDao.getLessonsByStudent(
-                instructor.getId(),
-                student.getId()
-        );
-
-        return studentsLessons;
+        return dynamoDao.getLessonsByStudent(student.getId());
     }
 
     public List<Lesson> getLessonsByInstructor(CognitoUser instructor) {
