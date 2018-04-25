@@ -19,6 +19,7 @@ public class LessonController {
     private LessonService lessonService;
 
     // create lesson - instructors are allowed to create lessons only for themselves
+    // maybe instructor id shouldn't be required in Lesson at this stage
     @PreAuthorize("hasRole('ROLE_INSTRUCTOR')")
     @PostMapping
     public Lesson addLesson(Authentication auth, @RequestBody Lesson lesson) throws Exception {
@@ -35,6 +36,7 @@ public class LessonController {
 
     // delete lesson - admin without restrictions, instructor may
     // delete only it's own lessons
+    // think about instructor id in lesson again
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_INSTRUCTOR')")
     @DeleteMapping
     public Lesson deleteLesson(Authentication auth, @RequestBody Lesson lesson) throws Exception {
