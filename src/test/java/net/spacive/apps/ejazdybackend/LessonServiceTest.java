@@ -121,7 +121,7 @@ public class LessonServiceTest {
 
         Lesson unregisteredLesson;
         try {
-            unregisteredLesson = lessonService.unregisterStudentFromLesson(registeredLesson);
+            unregisteredLesson = lessonService.forceUnregisterStudentFromLesson(registeredLesson);
         } catch (Exception e) {
             e.printStackTrace();
             unregisteredLesson = null;

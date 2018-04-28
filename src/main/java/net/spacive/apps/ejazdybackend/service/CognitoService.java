@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -79,6 +80,11 @@ public class CognitoService {
                 .withEmail(cognitoUser.getEmail())
                 .withPhone(cognitoUser.getPhone())
                 .withUserGroup(group)
+                .withLastModifiedDate(cognitoUser.getLastModifiedDate())
+                .withCreateDate(cognitoUser.getCreateDate())
+                .withLastName(cognitoUser.getLastName())
+                .withFirstName(cognitoUser.getFirstName())
+                .withStatus(cognitoUser.getStatus())
                 .build();
     }
 
@@ -101,10 +107,24 @@ public class CognitoService {
                     builder.withPhone(attr.getValue());
                 }
                 break;
+                case "given_name": {
+                    builder.withFirstName(attr.getValue());
+                }
+                break;
+                case "family_name": {
+                    builder.withLastName(attr.getValue());
+                }
+                break;
+                default: {
+                    log.info("ignoring cognito user attribute: " + attrName);
+                }
             }
         });
 
         builder.withUserGroup(userGroup);
+        builder.withStatus(user.getUserStatus());
+        builder.withCreateDate(user.getUserCreateDate());
+        builder.withLastModifiedDate(user.getUserLastModifiedDate());
 
         return builder.build();
     }

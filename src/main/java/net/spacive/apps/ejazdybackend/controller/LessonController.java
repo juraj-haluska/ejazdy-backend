@@ -25,9 +25,6 @@ public class LessonController {
     @PostMapping
     public Lesson addLesson(Authentication auth, @RequestBody Lesson lesson) throws Exception {
         CognitoUser instructor = (CognitoUser) auth.getPrincipal();
-        if (!instructor.getId().equals(lesson.getInstructorId())) {
-            throw new Exception("wrong instructor id");
-        }
         return lessonService.createLessonByInstructor(
                 instructor,
                 lesson.getStartTime(),
@@ -77,7 +74,7 @@ public class LessonController {
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_INSTRUCTOR')")
     @PutMapping("/student")
     public Lesson unregisterStudentFromLesson(@RequestBody Lesson lesson) throws Exception {
-        return lessonService.unregisterStudentFromLesson(
+        return lessonService.forceUnregisterStudentFromLesson(
                 lesson
         );
     }
@@ -111,7 +108,7 @@ public class LessonController {
         return lessonService.getLessonsByStudent(me);
     }
 
-    // register student to lesson - calling student
+    // register/unregister student to/from lesson - calling student
     @PreAuthorize("hasRole('ROLE_STUDENT')")
     @PutMapping("/student/me")
     public Lesson registerCallingStudentToLesson (
@@ -119,23 +116,14 @@ public class LessonController {
             @RequestBody Lesson lesson
     ) throws Exception {
         CognitoUser me = (CognitoUser) auth.getPrincipal();
-        return lessonService.registerStudentToLesson(
-                me,
-                lesson
-        );
-    }
 
-    // unregister student from lesson - calling student
-    @PreAuthorize("hasRole('ROLE_STUDENT')")
-    @DeleteMapping("/student/me")
-    public Lesson unregisterCallingStudentFromLesson (
-            Authentication auth,
-            @RequestBody Lesson lesson
-    ) throws Exception {
-        CognitoUser me = (CognitoUser) auth.getPrincipal();
-        lesson.setStudentId(me.getId());
-        return lessonService.unregisterStudentFromLesson(
-                lesson
-        );
+        if (lesson.getStudentId() == null || lesson.getStudentId().length() == 0) {
+            return lessonService.unregisterStudentFromLesson(me.getId(), lesson);
+        } else {
+            return lessonService.registerStudentToLesson(
+                    me,
+                    lesson
+            );
+        }
     }
 }

@@ -30,18 +30,32 @@ public class LessonService {
 
     public Lesson registerStudentToLesson(CognitoUser student, Lesson lesson) throws Exception {
         checkInstructorId(lesson);
-        lesson.setStudentId(student.getId());
+        Lesson fetchedLesson = dynamoDao.getLessonByInstructor(lesson.getInstructorId(), lesson.getStartTime());
+        if (fetchedLesson.getStudentId() == null || fetchedLesson.getStudentId().length() == 0) {
+            lesson.setStudentId(student.getId());
+            dynamoDao.updateLesson(lesson);
+            return lesson;
+        } else {
+            throw new Exception("lesson already registered to another student");
+        }
+    }
+
+    public Lesson forceUnregisterStudentFromLesson(Lesson lesson) throws Exception {
+//        checkStudentId(lesson);
+        lesson.setStudentId(null);
         dynamoDao.updateLesson(lesson);
         return lesson;
     }
 
-    public Lesson unregisterStudentFromLesson(Lesson lesson) throws Exception {
+    public Lesson unregisterStudentFromLesson(String studentId, Lesson lesson) throws Exception {
         // TODO check if the time is 24h before the actual lesson
-        // only in case of the student, maybe with param - force?
-        checkStudentId(lesson);
-        lesson.setStudentId(null);
-        dynamoDao.updateLesson(lesson);
-        return lesson;
+        checkInstructorId(lesson);
+        Lesson fetchedLesson = dynamoDao.getLessonByInstructor(lesson.getInstructorId(), lesson.getStartTime());
+        if (fetchedLesson.getStudentId().equals(studentId)) {
+            return forceUnregisterStudentFromLesson(lesson);
+        } else {
+            throw new Exception("lesson belongs another student");
+        }
     }
 
     public List<Lesson> getLessonsByStudent(CognitoUser student) {

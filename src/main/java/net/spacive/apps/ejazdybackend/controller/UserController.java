@@ -20,6 +20,12 @@ public class UserController {
         return userService.getAllInstructors();
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_INSTRUCTOR')")
+    @GetMapping("/student")
+    public List<CognitoUser> getAllStudents() {
+        return userService.getAllStudents();
+    }
+
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/student")
     public CognitoUser inviteStudent(@RequestParam("email") String email) {

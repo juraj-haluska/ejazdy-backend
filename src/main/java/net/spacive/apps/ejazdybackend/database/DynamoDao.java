@@ -4,6 +4,9 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
+import com.amazonaws.services.dynamodbv2.model.Condition;
 import net.spacive.apps.ejazdybackend.model.Lesson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -35,6 +38,42 @@ public class DynamoDao {
                         .withConsistentRead(false);
 
         return dbMapper.query(Lesson.class, queryExpression);
+    }
+
+    public Lesson getLessonByInstructor(String instructorId, String startTime) {
+        final DynamoDBQueryExpression<Lesson> queryExpression =
+                new DynamoDBQueryExpression<Lesson>()
+                        .withHashKeyValues(
+                                new Lesson().withInstructorId(instructorId)
+                        ).withRangeKeyCondition(
+                        "startTime",
+                        new Condition()
+                                .withComparisonOperator(ComparisonOperator.EQ)
+                                .withAttributeValueList(
+                                        new AttributeValue(startTime)
+                                )
+                );
+
+        return dbMapper.query(Lesson.class, queryExpression).get(0);
+    }
+
+    public Lesson getLessonByStudent(String studentId, String startTime) {
+        final DynamoDBQueryExpression<Lesson> queryExpression =
+                new DynamoDBQueryExpression<Lesson>()
+                        .withHashKeyValues(
+                                new Lesson().withStudentId(studentId)
+                        )
+                        .withConsistentRead(false)
+                        .withRangeKeyCondition(
+                        "startTime",
+                        new Condition()
+                                .withComparisonOperator(ComparisonOperator.EQ)
+                                .withAttributeValueList(
+                                        new AttributeValue(startTime)
+                                )
+                );
+
+        return dbMapper.query(Lesson.class, queryExpression).get(0);
     }
 
     public void createLesson(Lesson lesson) {
