@@ -1,6 +1,8 @@
 package net.spacive.apps.ejazdybackend.controller;
 
 import net.spacive.apps.ejazdybackend.model.CognitoUser;
+import net.spacive.apps.ejazdybackend.model.Lesson;
+import net.spacive.apps.ejazdybackend.service.LessonService;
 import net.spacive.apps.ejazdybackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -10,31 +12,40 @@ import java.util.List;
 
 @RestController
 @CrossOrigin
-public class UserController {
+@RequestMapping("/students")
+public class StudentController {
 
     @Autowired
     private UserService userService;
 
-    @GetMapping("/instructor")
-    public List<CognitoUser> getAllInstructors() {
-        return userService.getAllInstructors();
-    }
+    @Autowired
+    private LessonService lessonService;
 
+    // list all students
+    @GetMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_INSTRUCTOR')")
-    @GetMapping("/student")
     public List<CognitoUser> getAllStudents() {
         return userService.getAllStudents();
     }
 
+    // invite new student by email
+    // cognito will handle this
+    @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping("/student")
     public CognitoUser inviteStudent(@RequestParam("email") String email) {
         return userService.inviteNewStudentByEmail(email);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping("/instructor")
-    public CognitoUser inviteInstructor(@RequestParam("email") String email) {
-        return userService.inviteNewInstructorByEmail(email);
+    // get single student by UUID
+    @GetMapping("/{id}")
+    public CognitoUser getStudent(@PathVariable String id) {
+        return null;
+    }
+
+    // get all lessons of student
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_INSTRUCTOR')")
+    @GetMapping("/{id}/lessons")
+    public List<Lesson> getLessonsByStudent(@PathVariable String id) {
+        return lessonService.getLessonsByStudent(id);
     }
 }

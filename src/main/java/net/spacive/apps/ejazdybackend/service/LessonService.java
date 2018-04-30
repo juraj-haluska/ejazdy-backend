@@ -1,7 +1,6 @@
 package net.spacive.apps.ejazdybackend.service;
 
 import net.spacive.apps.ejazdybackend.database.DynamoDao;
-import net.spacive.apps.ejazdybackend.model.CognitoUser;
 import net.spacive.apps.ejazdybackend.model.Lesson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,73 +13,64 @@ public class LessonService {
     @Autowired
     private DynamoDao dynamoDao;
 
-    @Autowired
-    private CognitoService cognitoService;
-
-    // TODO return new lesson or throw exception
-    public Lesson createLessonByInstructor(CognitoUser instructor, String startTime, String stopTime) {
+    public Lesson createLessonByInstructor(String instructorId, Lesson lesson) {
         final Lesson newLesson = new Lesson()
-                .withInstructorId(instructor.getId())
-                .withStartTime(startTime)
-                .withStopTime(stopTime);
+                .withInstructorId(instructorId)
+                .withStartTime(lesson.getStartTime())
+                .withStopTime(lesson.getStopTime());
 
         dynamoDao.createLesson(newLesson);
         return newLesson;
     }
 
-    public Lesson registerStudentToLesson(CognitoUser student, Lesson lesson) throws Exception {
-        checkInstructorId(lesson);
-        Lesson fetchedLesson = dynamoDao.getLessonByInstructor(lesson.getInstructorId(), lesson.getStartTime());
+    // only if lesson is free
+    public Lesson registerStudentToLesson(String studentId, String instructorId, String startTime) throws Exception {
+        Lesson fetchedLesson = dynamoDao.getLessonByInstructor(instructorId, startTime);
+
         if (fetchedLesson.getStudentId() == null || fetchedLesson.getStudentId().length() == 0) {
-            lesson.setStudentId(student.getId());
-            dynamoDao.updateLesson(lesson);
-            return lesson;
+            fetchedLesson.withStudentId(studentId);
+            fetchedLesson.withStopTime(null);
+
+            dynamoDao.updateLesson(fetchedLesson, true);
+            return fetchedLesson;
         } else {
             throw new Exception("lesson already registered to another student");
         }
     }
 
-    public Lesson forceUnregisterStudentFromLesson(Lesson lesson) throws Exception {
-//        checkStudentId(lesson);
-        lesson.setStudentId(null);
-        dynamoDao.updateLesson(lesson);
-        return lesson;
-    }
+    // no foce mode - this method will delete student from lesson if this student
+    // is actually registered to it.
+    // force mode - delete any student from specified lesson
+    // TODO: disable unregistration in no force mode within 24h prior to lesson beginning
+    public Lesson unregisterStudentFromLesson(String studentId, String instructorId, String startTime, boolean force) throws Exception {
+        Lesson fetchedLesson = dynamoDao.getLessonByInstructor(instructorId, startTime);
+        if (fetchedLesson.getStudentId().equals(studentId) || force) {
+            Lesson toUpdate = new Lesson()
+                    .withInstructorId(instructorId)
+                    .withStartTime(startTime)
+                    .withStudentId(null);
 
-    public Lesson unregisterStudentFromLesson(String studentId, Lesson lesson) throws Exception {
-        // TODO check if the time is 24h before the actual lesson
-        checkInstructorId(lesson);
-        Lesson fetchedLesson = dynamoDao.getLessonByInstructor(lesson.getInstructorId(), lesson.getStartTime());
-        if (fetchedLesson.getStudentId().equals(studentId)) {
-            return forceUnregisterStudentFromLesson(lesson);
+            dynamoDao.updateLesson(toUpdate, false);
+            return toUpdate;
         } else {
             throw new Exception("lesson belongs another student");
         }
     }
 
-    public List<Lesson> getLessonsByStudent(CognitoUser student) {
-        return dynamoDao.getLessonsByStudent(student.getId());
+    public List<Lesson> getLessonsByStudent(String studentId) {
+        return dynamoDao.getLessonsByStudent(studentId);
     }
 
-    public List<Lesson> getLessonsByInstructor(CognitoUser instructor) {
-        return dynamoDao.getLessonsByInstructor(instructor.getId());
+    public List<Lesson> getLessonsByInstructor(String instructorId) {
+        return dynamoDao.getLessonsByInstructor(instructorId);
     }
 
-    public Lesson deleteLesson(Lesson lesson) throws Exception {
-        checkInstructorId(lesson);
-        dynamoDao.deleteLesson(lesson);
-        return lesson;
-    }
+    public Lesson deleteLesson(String instructorId, String startTime) throws Exception {
+        Lesson toDelete = new Lesson()
+                .withInstructorId(instructorId)
+                .withStartTime(startTime);
 
-    private void checkInstructorId(Lesson lesson) throws Exception {
-        if (lesson.getInstructorId() == null || lesson.getInstructorId().length() == 0) {
-            throw new Exception("Lesson object does not contain instructorId");
-        }
-    }
-
-    private void checkStudentId(Lesson lesson) throws Exception {
-        if (lesson.getStudentId() == null || lesson.getStudentId().length() == 0) {
-            throw new Exception("Lesson object does not contain studentId");
-        }
+        dynamoDao.deleteLesson(toDelete);
+        return toDelete;
     }
 }

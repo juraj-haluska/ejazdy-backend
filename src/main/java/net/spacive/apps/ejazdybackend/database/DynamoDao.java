@@ -65,13 +65,13 @@ public class DynamoDao {
                         )
                         .withConsistentRead(false)
                         .withRangeKeyCondition(
-                        "startTime",
-                        new Condition()
-                                .withComparisonOperator(ComparisonOperator.EQ)
-                                .withAttributeValueList(
-                                        new AttributeValue(startTime)
-                                )
-                );
+                                "startTime",
+                                new Condition()
+                                        .withComparisonOperator(ComparisonOperator.EQ)
+                                        .withAttributeValueList(
+                                                new AttributeValue(startTime)
+                                        )
+                        );
 
         return dbMapper.query(Lesson.class, queryExpression).get(0);
     }
@@ -84,9 +84,13 @@ public class DynamoDao {
         dbMapper.delete(lesson);
     }
 
-    public void updateLesson(Lesson lesson) {
+    public void updateLesson(Lesson lesson, boolean ignoreNullAttrs) {
         DynamoDBMapperConfig.Builder config = DynamoDBMapperConfig.builder();
-        config.setSaveBehavior(DynamoDBMapperConfig.SaveBehavior.UPDATE);
+        if (ignoreNullAttrs) {
+            config.setSaveBehavior(DynamoDBMapperConfig.SaveBehavior.UPDATE_SKIP_NULL_ATTRIBUTES);
+        } else {
+            config.setSaveBehavior(DynamoDBMapperConfig.SaveBehavior.UPDATE);
+        }
         dbMapper.save(lesson, config.build());
     }
 }
