@@ -17,11 +17,14 @@ import java.util.List;
 @RequestMapping("/instructors")
 public class InstructorController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final LessonService lessonService;
 
     @Autowired
-    private LessonService lessonService;
+    public InstructorController(UserService userService, LessonService lessonService) {
+        this.userService = userService;
+        this.lessonService = lessonService;
+    }
 
     // list all instructors
     @GetMapping
@@ -56,7 +59,7 @@ public class InstructorController {
     @PreAuthorize("hasRole('ROLE_INSTRUCTOR')")
     public Lesson createLesson(
             @PathVariable String id,
-            Lesson lesson,
+            @RequestBody Lesson lesson,
             Authentication auth) throws Exception {
 
         // check if instructor's id in token is same as id in path

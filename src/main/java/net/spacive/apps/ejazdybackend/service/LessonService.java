@@ -10,8 +10,12 @@ import java.util.List;
 @Service
 public class LessonService {
 
+    private final DynamoDao dynamoDao;
+
     @Autowired
-    private DynamoDao dynamoDao;
+    public LessonService(DynamoDao dynamoDao) {
+        this.dynamoDao = dynamoDao;
+    }
 
     public Lesson createLessonByInstructor(String instructorId, Lesson lesson) {
         final Lesson newLesson = new Lesson()
@@ -29,12 +33,11 @@ public class LessonService {
 
         if (fetchedLesson.getStudentId() == null || fetchedLesson.getStudentId().length() == 0) {
             fetchedLesson.withStudentId(studentId);
-            fetchedLesson.withStopTime(null);
 
             dynamoDao.updateLesson(fetchedLesson, true);
             return fetchedLesson;
         } else {
-            throw new Exception("lesson already registered to another student");
+            throw new Exception("lesson is already registered to another student");
         }
     }
 
@@ -45,13 +48,9 @@ public class LessonService {
     public Lesson unregisterStudentFromLesson(String studentId, String instructorId, String startTime, boolean force) throws Exception {
         Lesson fetchedLesson = dynamoDao.getLessonByInstructor(instructorId, startTime);
         if (fetchedLesson.getStudentId().equals(studentId) || force) {
-            Lesson toUpdate = new Lesson()
-                    .withInstructorId(instructorId)
-                    .withStartTime(startTime)
-                    .withStudentId(null);
-
-            dynamoDao.updateLesson(toUpdate, false);
-            return toUpdate;
+            fetchedLesson.setStudentId(null);
+            dynamoDao.updateLesson(fetchedLesson, false);
+            return fetchedLesson;
         } else {
             throw new Exception("lesson belongs another student");
         }
@@ -65,7 +64,7 @@ public class LessonService {
         return dynamoDao.getLessonsByInstructor(instructorId);
     }
 
-    public Lesson deleteLesson(String instructorId, String startTime) throws Exception {
+    public Lesson deleteLesson(String instructorId, String startTime) {
         Lesson toDelete = new Lesson()
                 .withInstructorId(instructorId)
                 .withStartTime(startTime);

@@ -16,8 +16,12 @@ import java.util.List;
 @Repository
 public class DynamoDao {
 
+    private final DynamoDBMapper dbMapper;
+
     @Autowired
-    private DynamoDBMapper dbMapper;
+    public DynamoDao(DynamoDBMapper dbMapper) {
+        this.dbMapper = dbMapper;
+    }
 
     public List<Lesson> getLessonsByInstructor(String instructorId) {
         final DynamoDBQueryExpression<Lesson> queryExpression =
@@ -54,7 +58,13 @@ public class DynamoDao {
                                 )
                 );
 
-        return dbMapper.query(Lesson.class, queryExpression).get(0);
+        List<Lesson> lessons = dbMapper.query(Lesson.class, queryExpression);
+
+        if (lessons != null && lessons.size() > 0) {
+            return lessons.get(0);
+        } else {
+            return null;
+        }
     }
 
     public Lesson getLessonByStudent(String studentId, String startTime) {
@@ -73,7 +83,13 @@ public class DynamoDao {
                                         )
                         );
 
-        return dbMapper.query(Lesson.class, queryExpression).get(0);
+        List<Lesson> lessons = dbMapper.query(Lesson.class, queryExpression);
+
+        if (lessons != null && lessons.size() > 0) {
+            return lessons.get(0);
+        } else {
+            return null;
+        }
     }
 
     public void createLesson(Lesson lesson) {
@@ -91,6 +107,7 @@ public class DynamoDao {
         } else {
             config.setSaveBehavior(DynamoDBMapperConfig.SaveBehavior.UPDATE);
         }
+
         dbMapper.save(lesson, config.build());
     }
 }

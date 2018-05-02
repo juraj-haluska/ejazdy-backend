@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -18,11 +17,14 @@ public class CognitoService {
 
     private static final Logger log = LoggerFactory.getLogger(CognitoService.class.getName());
 
-    @Autowired
-    private AWSCognitoIdentityProvider cognito;
+    private final AWSCognitoIdentityProvider cognito;
+    private final CognitoConfiguration config;
 
     @Autowired
-    private CognitoConfiguration config;
+    public CognitoService(AWSCognitoIdentityProvider cognito, CognitoConfiguration config) {
+        this.cognito = cognito;
+        this.config = config;
+    }
 
     public List<CognitoUser> getUsersInGroup(String userGroup) {
 

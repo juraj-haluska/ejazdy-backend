@@ -39,7 +39,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private CognitoConfiguration properties;
 
     // should cache keys
-    RemoteJWKSet remoteJWKSet;
+    private RemoteJWKSet remoteJWKSet;
 
     @Autowired
     public JwtAuthFilter(CognitoConfiguration properties) throws MalformedURLException {
@@ -54,7 +54,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             HttpServletResponse res,
             FilterChain chain) throws IOException, ServletException {
 
-        String header = req.getHeader(AUTH_HEADER_STRING).replace(AUTH_BEARER_STRING,"");
+        String header = req.getHeader(AUTH_HEADER_STRING).replace(AUTH_BEARER_STRING, "");
 
         try {
             JWT jwt = JWTParser.parse(header);
@@ -74,11 +74,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 List<String> groups = (List<String>) claimsSet.getClaim(COGNITO_GROUP_CLAIM);
                 List<GrantedAuthority> authorities = new ArrayList<>();
 
-                groups.forEach(group -> {
-                    authorities.add(new SimpleGrantedAuthority(
-                            properties.getGroupRoleMap().get(group)
-                    ));
-                });
+                groups.forEach(group ->
+                        authorities.add(new SimpleGrantedAuthority(
+                                properties.getGroupRoleMap().get(group)
+                        ))
+                );
 
                 // process other claims
                 final CognitoUser cognitoUser = new CognitoUser.Builder()

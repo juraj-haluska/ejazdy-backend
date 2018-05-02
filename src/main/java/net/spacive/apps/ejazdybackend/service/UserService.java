@@ -9,8 +9,12 @@ import java.util.List;
 @Service
 public class UserService {
 
+    private final CognitoService cognitoService;
+
     @Autowired
-    private CognitoService cognitoService;
+    public UserService(CognitoService cognitoService) {
+        this.cognitoService = cognitoService;
+    }
 
     public CognitoUser inviteNewStudentByEmail(String email) {
         CognitoUser invitedUser = cognitoService.inviteUser(email);

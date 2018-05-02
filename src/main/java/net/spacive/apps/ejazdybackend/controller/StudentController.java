@@ -15,11 +15,14 @@ import java.util.List;
 @RequestMapping("/students")
 public class StudentController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final LessonService lessonService;
 
     @Autowired
-    private LessonService lessonService;
+    public StudentController(UserService userService, LessonService lessonService) {
+        this.userService = userService;
+        this.lessonService = lessonService;
+    }
 
     // list all students
     @GetMapping

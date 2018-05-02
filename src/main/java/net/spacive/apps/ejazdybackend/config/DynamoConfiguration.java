@@ -49,14 +49,12 @@ public class DynamoConfiguration {
                 secretKey
         );
 
-        AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard()
+        return AmazonDynamoDBClientBuilder.standard()
                 .withCredentials(
                         new AWSStaticCredentialsProvider(credentials)
                 )
                 .withRegion(region)
                 .build();
-
-        return client;
     }
 
     @Bean
