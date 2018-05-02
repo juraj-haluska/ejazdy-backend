@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public class DynamoDao {
@@ -24,6 +25,8 @@ public class DynamoDao {
     }
 
     public List<Lesson> getLessonsByInstructor(String instructorId) {
+        checkValidId(instructorId);
+
         final DynamoDBQueryExpression<Lesson> queryExpression =
                 new DynamoDBQueryExpression<Lesson>()
                         .withHashKeyValues(
@@ -34,6 +37,8 @@ public class DynamoDao {
     }
 
     public List<Lesson> getLessonsByStudent(String studentId) {
+        checkValidId(studentId);
+
         final DynamoDBQueryExpression<Lesson> queryExpression =
                 new DynamoDBQueryExpression<Lesson>()
                         .withHashKeyValues(
@@ -45,6 +50,8 @@ public class DynamoDao {
     }
 
     public Lesson getLessonByInstructor(String instructorId, String startTime) {
+        checkValidId(instructorId);
+
         final DynamoDBQueryExpression<Lesson> queryExpression =
                 new DynamoDBQueryExpression<Lesson>()
                         .withHashKeyValues(
@@ -68,6 +75,8 @@ public class DynamoDao {
     }
 
     public Lesson getLessonByStudent(String studentId, String startTime) {
+        checkValidId(studentId);
+
         final DynamoDBQueryExpression<Lesson> queryExpression =
                 new DynamoDBQueryExpression<Lesson>()
                         .withHashKeyValues(
@@ -109,5 +118,11 @@ public class DynamoDao {
         }
 
         dbMapper.save(lesson, config.build());
+    }
+
+    private void checkValidId(String  id) {
+        if (id == null) throw new IllegalArgumentException("ID cannot be null");
+        if (id.length() == 0) throw new IllegalArgumentException("ID cannot be empty string");
+        UUID parsed = UUID.fromString(id);
     }
 }
