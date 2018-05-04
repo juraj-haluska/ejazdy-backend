@@ -44,7 +44,7 @@ public class InstructorController {
     // accessible by every role
     @GetMapping("/{id}")
     public CognitoUser getInstructor(@PathVariable String id) {
-        return null;
+        return userService.getUser(id);
     }
 
     // get lessons of instructor specified by id

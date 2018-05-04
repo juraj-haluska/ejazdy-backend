@@ -123,6 +123,5 @@ public class DynamoDao {
     private void checkValidId(String  id) {
         if (id == null) throw new IllegalArgumentException("ID cannot be null");
         if (id.length() == 0) throw new IllegalArgumentException("ID cannot be empty string");
-        UUID parsed = UUID.fromString(id);
     }
 }

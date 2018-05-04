@@ -130,4 +130,22 @@ public class CognitoService {
 
         return builder.build();
     }
+
+    public CognitoUser getUser(String uuid) {
+        ListUsersRequest request = new ListUsersRequest()
+                .withFilter(
+                        String.format("sub = \"%s\"", uuid)
+                )
+                .withLimit(1)
+                .withUserPoolId(config.getPoolId());
+
+        List<UserType> userTypes = cognito.listUsers(request).getUsers();
+
+        if (userTypes != null && userTypes.size() > 0) {
+            UserType user = userTypes.get(0);
+            return userTypeToCognitoUser(user, null);
+        }
+
+        return null;
+    }
 }

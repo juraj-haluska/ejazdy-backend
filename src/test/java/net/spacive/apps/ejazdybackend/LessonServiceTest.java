@@ -129,7 +129,7 @@ public class LessonServiceTest {
 
 
         // register student to lesson
-        Lesson registeredLesson = lessonService.registerStudentToLesson(
+        lessonService.registerStudentToLesson(
                 student.getId(),
                 instructor.getId(),
                 createdLesson.getStartTime()

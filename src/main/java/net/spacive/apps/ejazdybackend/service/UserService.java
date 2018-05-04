@@ -40,4 +40,7 @@ public class UserService {
         return cognitoService.getUsersInGroup("student");
     }
 
+    public CognitoUser getUser(String uuid) {
+        return cognitoService.getUser(uuid);
+    }
 }

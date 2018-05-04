@@ -42,7 +42,7 @@ public class StudentController {
     // get single student by UUID
     @GetMapping("/{id}")
     public CognitoUser getStudent(@PathVariable String id) {
-        return null;
+        return userService.getUser(id);
     }
 
     // get all lessons of student
