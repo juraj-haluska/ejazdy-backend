@@ -34,7 +34,7 @@ public class LessonServiceTest {
                 .withStopTime(stopTime);
 
         lessonService.createLessonByInstructor(
-                instructor.getId(),
+                instructor,
                 toCreateLesson
         );
 
@@ -78,7 +78,7 @@ public class LessonServiceTest {
 
         // create lesson
         Lesson createdLesson = lessonService.createLessonByInstructor(
-                instructor.getId(),
+                instructor,
                 toCreateLesson
         );
 
@@ -86,7 +86,7 @@ public class LessonServiceTest {
         Lesson registeredLesson;
         try {
             registeredLesson = lessonService.registerStudentToLesson(
-                    student.getId(),
+                    student,
                     instructor.getId(),
                     createdLesson.getStartTime()
             );
@@ -123,14 +123,14 @@ public class LessonServiceTest {
 
         // create lesson
         Lesson createdLesson = lessonService.createLessonByInstructor(
-                instructor.getId(),
+                instructor,
                 toCreateLesson
         );
 
 
         // register student to lesson
         lessonService.registerStudentToLesson(
-                student.getId(),
+                student,
                 instructor.getId(),
                 createdLesson.getStartTime()
         );

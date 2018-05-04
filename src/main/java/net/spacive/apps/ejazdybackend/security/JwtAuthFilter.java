@@ -85,6 +85,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         .withId(claimsSet.getSubject())
                         .withEmail((String) claimsSet.getClaim("email"))
                         .withPhone((String) claimsSet.getClaim("phone_number"))
+                        .withFirstName((String) claimsSet.getClaim("given_name"))
+                        .withLastName((String) claimsSet.getClaim("family_name"))
                         .withUserGroup(groups.get(0))   // group with highest precedence
                         .build();
 

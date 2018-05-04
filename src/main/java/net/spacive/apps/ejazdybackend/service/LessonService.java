@@ -1,6 +1,7 @@
 package net.spacive.apps.ejazdybackend.service;
 
 import net.spacive.apps.ejazdybackend.database.DynamoDao;
+import net.spacive.apps.ejazdybackend.model.CognitoUser;
 import net.spacive.apps.ejazdybackend.model.Lesson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,22 +18,31 @@ public class LessonService {
         this.dynamoDao = dynamoDao;
     }
 
-    public Lesson createLessonByInstructor(String instructorId, Lesson lesson) {
-        final Lesson newLesson = new Lesson()
-                .withInstructorId(instructorId)
-                .withStartTime(lesson.getStartTime())
-                .withStopTime(lesson.getStopTime());
+    public Lesson createLessonByInstructor(CognitoUser instructor, Lesson lesson) {
 
-        dynamoDao.createLesson(newLesson);
-        return newLesson;
+        final Lesson newLesson = new Lesson()
+                .withInstructorId(instructor.getId())
+                .withStartTime(lesson.getStartTime())
+                .withStopTime(lesson.getStopTime())
+                .withInstructorName(
+                        instructor.getFirstName() + " " + instructor.getLastName()
+                );
+
+        if (dynamoDao.createLesson(newLesson)) {
+            return newLesson;
+        } else {
+            return null;
+        }
     }
 
     // only if lesson is free
-    public Lesson registerStudentToLesson(String studentId, String instructorId, String startTime) throws Exception {
+    public Lesson registerStudentToLesson(CognitoUser student, String instructorId, String startTime) throws Exception {
         Lesson fetchedLesson = dynamoDao.getLessonByInstructor(instructorId, startTime);
 
         if (fetchedLesson.getStudentId() == null || fetchedLesson.getStudentId().length() == 0) {
-            fetchedLesson.withStudentId(studentId);
+
+            fetchedLesson.withStudentId(student.getId());
+            fetchedLesson.withStudentName(student.getFirstName() + " " + student.getLastName());
 
             dynamoDao.updateLesson(fetchedLesson, true);
             return fetchedLesson;
@@ -49,6 +59,7 @@ public class LessonService {
         Lesson fetchedLesson = dynamoDao.getLessonByInstructor(instructorId, startTime);
         if (fetchedLesson.getStudentId().equals(studentId) || force) {
             fetchedLesson.setStudentId(null);
+            fetchedLesson.setStudentName(null);
             dynamoDao.updateLesson(fetchedLesson, false);
             return fetchedLesson;
         } else {

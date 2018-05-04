@@ -11,6 +11,8 @@ public class Lesson {
     private String startTime;
     private String stopTime;
     private String studentId;
+    private String instructorName;
+    private String studentName;
 
     @DynamoDBHashKey
     public String getInstructorId() {
@@ -48,6 +50,24 @@ public class Lesson {
         this.stopTime = stopTime;
     }
 
+    @DynamoDBAttribute
+    public String getInstructorName() {
+        return instructorName;
+    }
+
+    public void setInstructorName(String instructorName) {
+        this.instructorName = instructorName;
+    }
+
+    @DynamoDBAttribute
+    public String getStudentName() {
+        return studentName;
+    }
+
+    public void setStudentName(String studentName) {
+        this.studentName = studentName;
+    }
+
     public Lesson withInstructorId(String instructorId) {
         this.instructorId = instructorId;
         return this;
@@ -68,15 +88,27 @@ public class Lesson {
         return this;
     }
 
+    public Lesson withInstructorName(String instructorName) {
+        this.instructorName = instructorName;
+        return this;
+    }
+
+    public Lesson withStudentName(String studentName) {
+        this.studentName = studentName;
+        return this;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Lesson that = (Lesson) o;
-        return Objects.equals(instructorId, that.instructorId) &&
-                Objects.equals(startTime, that.startTime) &&
-                Objects.equals(stopTime, that.stopTime) &&
-                Objects.equals(studentId, that.studentId);
+        Lesson lesson = (Lesson) o;
+        return Objects.equals(instructorId, lesson.instructorId) &&
+                Objects.equals(startTime, lesson.startTime) &&
+                Objects.equals(stopTime, lesson.stopTime) &&
+                Objects.equals(studentId, lesson.studentId) &&
+                Objects.equals(instructorName, lesson.instructorName) &&
+                Objects.equals(studentName, lesson.studentName);
     }
 
     @Override
@@ -86,6 +118,8 @@ public class Lesson {
                 ", startTime='" + startTime + '\'' +
                 ", stopTime='" + stopTime + '\'' +
                 ", studentId='" + studentId + '\'' +
+                ", instructorName='" + instructorName + '\'' +
+                ", studentName='" + studentName + '\'' +
                 '}';
     }
 }

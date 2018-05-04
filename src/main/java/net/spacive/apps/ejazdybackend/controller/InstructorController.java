@@ -66,7 +66,7 @@ public class InstructorController {
         CognitoUser instructor = (CognitoUser) auth.getPrincipal();
 
         if (instructor.getId().equals(id)) {
-            return lessonService.createLessonByInstructor(id, lesson);
+            return lessonService.createLessonByInstructor(instructor, lesson);
         } else {
             throw new Exception("instructor id must be same as instructor id in token");
         }
@@ -118,8 +118,10 @@ public class InstructorController {
             }
         }
 
+        CognitoUser student = userService.getUser(studentId);
+
         return lessonService.registerStudentToLesson(
-                studentId,
+                student,
                 id,
                 startTime
         );
@@ -137,7 +139,7 @@ public class InstructorController {
         CognitoUser student = (CognitoUser) auth.getPrincipal();
 
         return lessonService.registerStudentToLesson(
-                student.getId(),
+                student,
                 id,
                 startTime
         );

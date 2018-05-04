@@ -101,8 +101,17 @@ public class DynamoDao {
         }
     }
 
-    public void createLesson(Lesson lesson) {
-        dbMapper.save(lesson);
+    public boolean createLesson(Lesson lesson) {
+        Lesson exists = getLessonByInstructor(
+                lesson.getInstructorId(),
+                lesson.getStartTime()
+        );
+        if (exists == null) {
+            dbMapper.save(lesson);
+            return true;
+        }
+        
+        return false;
     }
 
     public void deleteLesson(Lesson lesson) {
@@ -123,5 +132,6 @@ public class DynamoDao {
     private void checkValidId(String  id) {
         if (id == null) throw new IllegalArgumentException("ID cannot be null");
         if (id.length() == 0) throw new IllegalArgumentException("ID cannot be empty string");
+        UUID.fromString(id);
     }
 }
