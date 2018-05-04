@@ -7,10 +7,12 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import com.amazonaws.services.dynamodbv2.model.Condition;
+import com.amazonaws.util.DateUtils;
 import net.spacive.apps.ejazdybackend.model.Lesson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,8 +51,10 @@ public class DynamoDao {
         return dbMapper.query(Lesson.class, queryExpression);
     }
 
-    public Lesson getLessonByInstructor(String instructorId, String startTime) {
+    public Lesson getLessonByInstructor(String instructorId, Calendar startTime) {
         checkValidId(instructorId);
+
+        final String startTimeString = DateUtils.formatISO8601Date(startTime.getTime());
 
         final DynamoDBQueryExpression<Lesson> queryExpression =
                 new DynamoDBQueryExpression<Lesson>()
@@ -61,7 +65,7 @@ public class DynamoDao {
                         new Condition()
                                 .withComparisonOperator(ComparisonOperator.EQ)
                                 .withAttributeValueList(
-                                        new AttributeValue(startTime)
+                                        new AttributeValue(startTimeString)
                                 )
                 );
 
@@ -74,8 +78,10 @@ public class DynamoDao {
         }
     }
 
-    public Lesson getLessonByStudent(String studentId, String startTime) {
+    public Lesson getLessonByStudent(String studentId, Calendar startTime) {
         checkValidId(studentId);
+
+        final String startTimeString = DateUtils.formatISO8601Date(startTime.getTime());
 
         final DynamoDBQueryExpression<Lesson> queryExpression =
                 new DynamoDBQueryExpression<Lesson>()
@@ -88,7 +94,7 @@ public class DynamoDao {
                                 new Condition()
                                         .withComparisonOperator(ComparisonOperator.EQ)
                                         .withAttributeValueList(
-                                                new AttributeValue(startTime)
+                                                new AttributeValue(startTimeString)
                                         )
                         );
 

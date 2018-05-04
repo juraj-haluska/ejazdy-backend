@@ -2,14 +2,15 @@ package net.spacive.apps.ejazdybackend.model;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
 
+import java.util.Calendar;
 import java.util.Objects;
 
 @DynamoDBTable(tableName="Lesson")
 public class Lesson {
 
     private String instructorId;
-    private String startTime;
-    private String stopTime;
+    private Calendar startTime;
+    private Calendar stopTime;
     private String studentId;
     private String instructorName;
     private String studentName;
@@ -24,11 +25,11 @@ public class Lesson {
 
     @DynamoDBRangeKey
     @DynamoDBIndexRangeKey(globalSecondaryIndexName = "StudentIdStartTime")
-    public String getStartTime() {
+    public Calendar getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(String startTime) {
+    public void setStartTime(Calendar startTime) {
         this.startTime = startTime;
     }
 
@@ -42,11 +43,11 @@ public class Lesson {
     }
 
     @DynamoDBAttribute
-    public String getStopTime() {
+    public Calendar getStopTime() {
         return stopTime;
     }
 
-    public void setStopTime(String stopTime) {
+    public void setStopTime(Calendar stopTime) {
         this.stopTime = stopTime;
     }
 
@@ -78,12 +79,12 @@ public class Lesson {
         return this;
     }
 
-    public Lesson withStartTime(String startTime) {
+    public Lesson withStartTime(Calendar startTime) {
         this.startTime = startTime;
         return this;
     }
 
-    public Lesson withStopTime(String stopTime) {
+    public Lesson withStopTime(Calendar stopTime) {
         this.stopTime = stopTime;
         return this;
     }
