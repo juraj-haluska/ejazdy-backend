@@ -44,7 +44,7 @@ public class DynamoDaoTest {
     @Test
     public void createAndDeleteLesson() {
         final String instructor = UUID.randomUUID().toString();
-        final String startTime = Calendar.getInstance().toString();
+        final Calendar startTime = Calendar.getInstance();
 
         Lesson newLesson = new Lesson()
                 .withInstructorId(instructor)
@@ -85,7 +85,7 @@ public class DynamoDaoTest {
 
         final String instructor = UUID.randomUUID().toString();
         final String student = UUID.randomUUID().toString();
-        final String startTime = Calendar.getInstance().toString();
+        final Calendar startTime = Calendar.getInstance();
 
         Lesson newLesson = new Lesson()
                 .withInstructorId(instructor)
@@ -143,11 +143,11 @@ public class DynamoDaoTest {
 
         String instructorId = UUID.randomUUID().toString();
 
-        List<String> startTimes = new ArrayList<>();
+        List<Calendar> startTimes = new ArrayList<>();
 
         // generate lessonCount lessons
         IntStream.range(0, lessonCount).forEach(n -> {
-            startTimes.add(Calendar.getInstance().toString());
+            startTimes.add(Calendar.getInstance());
             dynamoDao.createLesson(
                     new Lesson()
                             .withInstructorId(instructorId)
@@ -175,11 +175,11 @@ public class DynamoDaoTest {
         final String instructorId = UUID.randomUUID().toString();
         final String studentId = UUID.randomUUID().toString();
 
-        List<String> startTimes = new ArrayList<>();
+        List<Calendar> startTimes = new ArrayList<>();
 
         // generate lessonCount lessons
         IntStream.range(0, lessonCount).forEach(n -> {
-            startTimes.add(Calendar.getInstance().toString());
+            startTimes.add(Calendar.getInstance());
             dynamoDao.createLesson(
                     new Lesson()
                             .withInstructorId(instructorId)
@@ -204,7 +204,7 @@ public class DynamoDaoTest {
     @Test
     public void getLessonByInstructor() {
         final String instructorId = UUID.randomUUID().toString();
-        final String startTime = Calendar.getInstance().toString();
+        final Calendar startTime = Calendar.getInstance();
 
         final Lesson newLesson = new Lesson()
                 .withInstructorId(instructorId)
@@ -226,7 +226,7 @@ public class DynamoDaoTest {
     public void getLessonByStudent() {
         final String instructorId = UUID.randomUUID().toString();
         final String studentId = UUID.randomUUID().toString();
-        final String startTime = Calendar.getInstance().toString();
+        final Calendar startTime = Calendar.getInstance();
 
         final Lesson newLesson = new Lesson()
                 .withInstructorId(instructorId)

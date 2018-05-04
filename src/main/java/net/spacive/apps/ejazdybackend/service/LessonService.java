@@ -6,6 +6,7 @@ import net.spacive.apps.ejazdybackend.model.Lesson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
 import java.util.List;
 
 @Service
@@ -36,7 +37,7 @@ public class LessonService {
     }
 
     // only if lesson is free
-    public Lesson registerStudentToLesson(CognitoUser student, String instructorId, String startTime) throws Exception {
+    public Lesson registerStudentToLesson(CognitoUser student, String instructorId, Calendar startTime) throws Exception {
         Lesson fetchedLesson = dynamoDao.getLessonByInstructor(instructorId, startTime);
 
         if (fetchedLesson.getStudentId() == null || fetchedLesson.getStudentId().length() == 0) {
@@ -55,7 +56,7 @@ public class LessonService {
     // is actually registered to it.
     // force mode - delete any student from specified lesson
     // TODO: disable unregistration in no force mode within 24h prior to lesson beginning
-    public Lesson unregisterStudentFromLesson(String studentId, String instructorId, String startTime, boolean force) throws Exception {
+    public Lesson unregisterStudentFromLesson(String studentId, String instructorId, Calendar startTime, boolean force) throws Exception {
         Lesson fetchedLesson = dynamoDao.getLessonByInstructor(instructorId, startTime);
         if (fetchedLesson.getStudentId().equals(studentId) || force) {
             fetchedLesson.setStudentId(null);
@@ -75,7 +76,7 @@ public class LessonService {
         return dynamoDao.getLessonsByInstructor(instructorId);
     }
 
-    public Lesson deleteLesson(String instructorId, String startTime) {
+    public Lesson deleteLesson(String instructorId, Calendar startTime) {
         Lesson toDelete = new Lesson()
                 .withInstructorId(instructorId)
                 .withStartTime(startTime);

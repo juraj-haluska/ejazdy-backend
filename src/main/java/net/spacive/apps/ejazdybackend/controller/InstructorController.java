@@ -1,5 +1,6 @@
 package net.spacive.apps.ejazdybackend.controller;
 
+import net.spacive.apps.ejazdybackend.config.Utils;
 import net.spacive.apps.ejazdybackend.model.CognitoUser;
 import net.spacive.apps.ejazdybackend.model.Lesson;
 import net.spacive.apps.ejazdybackend.service.LessonService;
@@ -93,7 +94,7 @@ public class InstructorController {
             }
         }
 
-        return lessonService.deleteLesson(id, startTime);
+        return lessonService.deleteLesson(id, Utils.parseISOString(startTime));
     }
 
     // register student to lesson - admin no restrictions
@@ -123,7 +124,7 @@ public class InstructorController {
         return lessonService.registerStudentToLesson(
                 student,
                 id,
-                startTime
+                Utils.parseISOString(startTime)
         );
     }
 
@@ -141,7 +142,7 @@ public class InstructorController {
         return lessonService.registerStudentToLesson(
                 student,
                 id,
-                startTime
+                Utils.parseISOString(startTime)
         );
     }
 
@@ -170,7 +171,7 @@ public class InstructorController {
         return lessonService.unregisterStudentFromLesson(
                 studentId,
                 id,
-                startTime,
+                Utils.parseISOString(startTime),
                 true
         );
     }
@@ -188,7 +189,7 @@ public class InstructorController {
         return lessonService.unregisterStudentFromLesson(
                 student.getId(),
                 id,
-                startTime,
+                Utils.parseISOString(startTime),
                 false
         );
     }

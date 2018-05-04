@@ -26,8 +26,8 @@ public class LessonServiceTest {
         // create new lesson
         CognitoUser instructor = createRandomInstructor();
 
-        final String startTime = "123456";
-        final String stopTime = "654321";
+        final Calendar startTime = Calendar.getInstance();
+        final Calendar stopTime = Calendar.getInstance();
 
         final Lesson toCreateLesson = new Lesson()
                 .withStartTime(startTime)
@@ -73,8 +73,8 @@ public class LessonServiceTest {
         CognitoUser student = createRandomStudent();
 
         final Lesson toCreateLesson = new Lesson()
-                .withStartTime(Calendar.getInstance().toString())
-                .withStopTime(Calendar.getInstance().toString());
+                .withStartTime(Calendar.getInstance())
+                .withStopTime(Calendar.getInstance());
 
         // create lesson
         Lesson createdLesson = lessonService.createLessonByInstructor(
@@ -118,8 +118,8 @@ public class LessonServiceTest {
         CognitoUser student = createRandomStudent();
 
         final Lesson toCreateLesson = new Lesson()
-                .withStartTime(Calendar.getInstance().toString())
-                .withStopTime(Calendar.getInstance().toString());
+                .withStartTime(Calendar.getInstance())
+                .withStopTime(Calendar.getInstance());
 
         // create lesson
         Lesson createdLesson = lessonService.createLessonByInstructor(
