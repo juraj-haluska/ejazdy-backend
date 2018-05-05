@@ -88,6 +88,7 @@ public class InstructorController {
 
         // check if instructor's id in token is same as id in path
         CognitoUser instructor = (CognitoUser) auth.getPrincipal();
+        instructor = userService.getUser(instructor.getId());
 
         if (instructor.getId().equals(id)) {
             return lessonService.createLessonByInstructor(instructor, lesson);
@@ -161,6 +162,7 @@ public class InstructorController {
             Authentication auth) throws Exception {
 
         CognitoUser student = (CognitoUser) auth.getPrincipal();
+        student = userService.getUser(student.getId());
 
         return lessonService.registerStudentToLesson(
                 student,

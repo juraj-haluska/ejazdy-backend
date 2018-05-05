@@ -7,6 +7,7 @@ import net.spacive.apps.ejazdybackend.service.LessonService;
 import net.spacive.apps.ejazdybackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Calendar;
@@ -74,5 +75,26 @@ public class StudentController {
         } else {
             return lessonService.getLessonsByStudent(id);
         }
+    }
+
+    // "me" path is used because we can avoid processing user roles
+    // inside controller methods
+    @PreAuthorize("hasRole('ROLE_STUDENT')")
+    @GetMapping("/me/lessons")
+    public List<Lesson> getLessonsByMe(
+            Authentication auth,
+            @RequestParam("since") Optional<String> since,
+            @RequestParam("from") Optional<String> from,
+            @RequestParam("to") Optional<String> to) {
+
+        CognitoUser student = (CognitoUser) auth.getPrincipal();
+        student = userService.getUser(student.getId());
+
+        return getLessonsByStudent(
+                student.getId(),
+                since,
+                from,
+                to
+        );
     }
 }
