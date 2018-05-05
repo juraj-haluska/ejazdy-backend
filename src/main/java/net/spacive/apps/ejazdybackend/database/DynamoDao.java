@@ -38,6 +38,58 @@ public class DynamoDao {
         return dbMapper.query(Lesson.class, queryExpression);
     }
 
+    public List<Lesson> getLessonsByInstructorSince(
+            String instructorId,
+            Calendar since) {
+
+        checkValidId(instructorId);
+
+        final DynamoDBQueryExpression<Lesson> queryExpression =
+                new DynamoDBQueryExpression<Lesson>()
+                        .withHashKeyValues(
+                                new Lesson().withInstructorId(instructorId)
+                        ).withRangeKeyCondition(
+                        "startTime",
+                        new Condition()
+                                .withComparisonOperator(ComparisonOperator.GE)
+                                .withAttributeValueList(
+                                        new AttributeValue(
+                                                DateUtils.formatISO8601Date(since.getTime())
+                                        )
+                                )
+                );
+
+        return dbMapper.query(Lesson.class, queryExpression);
+    }
+
+    public List<Lesson> getLessonsByInstructorRange(
+            String instructorId,
+            Calendar from,
+            Calendar to) {
+
+        checkValidId(instructorId);
+
+        final DynamoDBQueryExpression<Lesson> queryExpression =
+                new DynamoDBQueryExpression<Lesson>()
+                        .withHashKeyValues(
+                                new Lesson().withInstructorId(instructorId)
+                        ).withRangeKeyCondition(
+                        "startTime",
+                        new Condition()
+                                .withComparisonOperator(ComparisonOperator.BETWEEN)
+                                .withAttributeValueList(
+                                        new AttributeValue(
+                                                DateUtils.formatISO8601Date(from.getTime())
+                                        ),
+                                        new AttributeValue(
+                                                DateUtils.formatISO8601Date(to.getTime())
+                                        )
+                                )
+                );
+
+        return dbMapper.query(Lesson.class, queryExpression);
+    }
+
     public List<Lesson> getLessonsByStudent(String studentId) {
         checkValidId(studentId);
 
@@ -47,6 +99,62 @@ public class DynamoDao {
                                 new Lesson().withStudentId(studentId)
                         )
                         .withConsistentRead(false);
+
+        return dbMapper.query(Lesson.class, queryExpression);
+    }
+
+    public List<Lesson> getLessonsByStudentSince(
+            String studentId,
+            Calendar since) {
+
+        checkValidId(studentId);
+
+        final DynamoDBQueryExpression<Lesson> queryExpression =
+                new DynamoDBQueryExpression<Lesson>()
+                        .withHashKeyValues(
+                                new Lesson().withStudentId(studentId)
+                        )
+                        .withConsistentRead(false)
+                        .withRangeKeyCondition(
+                                "startTime",
+                                new Condition()
+                                        .withComparisonOperator(ComparisonOperator.GE)
+                                        .withAttributeValueList(
+                                                new AttributeValue(
+                                                        DateUtils.formatISO8601Date(since.getTime())
+                                                )
+                                        )
+                        );
+
+        return dbMapper.query(Lesson.class, queryExpression);
+    }
+
+    public List<Lesson> getLessonsByStudentRange(
+            String studentId,
+            Calendar from,
+            Calendar to) {
+
+        checkValidId(studentId);
+
+        final DynamoDBQueryExpression<Lesson> queryExpression =
+                new DynamoDBQueryExpression<Lesson>()
+                        .withHashKeyValues(
+                                new Lesson().withStudentId(studentId)
+                        )
+                        .withConsistentRead(false)
+                        .withRangeKeyCondition(
+                                "startTime",
+                                new Condition()
+                                        .withComparisonOperator(ComparisonOperator.BETWEEN)
+                                        .withAttributeValueList(
+                                                new AttributeValue(
+                                                        DateUtils.formatISO8601Date(from.getTime())
+                                                ),
+                                                new AttributeValue(
+                                                        DateUtils.formatISO8601Date(to.getTime())
+                                                )
+                                        )
+                        );
 
         return dbMapper.query(Lesson.class, queryExpression);
     }
@@ -116,7 +224,7 @@ public class DynamoDao {
             dbMapper.save(lesson);
             return true;
         }
-        
+
         return false;
     }
 
@@ -135,7 +243,7 @@ public class DynamoDao {
         dbMapper.save(lesson, config.build());
     }
 
-    private void checkValidId(String  id) {
+    private void checkValidId(String id) {
         if (id == null) throw new IllegalArgumentException("ID cannot be null");
         if (id.length() == 0) throw new IllegalArgumentException("ID cannot be empty string");
         UUID.fromString(id);

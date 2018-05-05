@@ -1,5 +1,6 @@
 package net.spacive.apps.ejazdybackend.controller;
 
+import net.spacive.apps.ejazdybackend.config.Utils;
 import net.spacive.apps.ejazdybackend.model.CognitoUser;
 import net.spacive.apps.ejazdybackend.model.Lesson;
 import net.spacive.apps.ejazdybackend.service.LessonService;
@@ -8,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin
@@ -45,10 +48,31 @@ public class StudentController {
         return userService.getUser(id);
     }
 
-    // get all lessons of student
+    // get lessons of student
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_INSTRUCTOR')")
     @GetMapping("/{id}/lessons")
-    public List<Lesson> getLessonsByStudent(@PathVariable String id) {
-        return lessonService.getLessonsByStudent(id);
+    public List<Lesson> getLessonsByStudent(
+            @PathVariable String id,
+            @RequestParam("since") Optional<String> since,
+            @RequestParam("from") Optional<String> from,
+            @RequestParam("to") Optional<String> to) {
+
+        if (since.isPresent()) {
+            Calendar sinceCal = Utils.parseISOString(since.get());
+            return lessonService.getLessonsByStudentSince(
+                    id,
+                    sinceCal
+            );
+        } else if(from.isPresent() && to.isPresent()) {
+            Calendar fromCal = Utils.parseISOString(from.get());
+            Calendar toCal = Utils.parseISOString(to.get());
+            return lessonService.getLessonsByStudentRange(
+                    id,
+                    fromCal,
+                    toCal
+            );
+        } else {
+            return lessonService.getLessonsByStudent(id);
+        }
     }
 }

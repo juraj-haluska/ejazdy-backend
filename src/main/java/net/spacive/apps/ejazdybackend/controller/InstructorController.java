@@ -11,7 +11,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin
@@ -51,8 +53,29 @@ public class InstructorController {
     // get lessons of instructor specified by id
     // accessible by every role
     @GetMapping("/{id}/lessons")
-    public List<Lesson> getInstructorsLessons(@PathVariable String id) {
-        return lessonService.getLessonsByInstructor(id);
+    public List<Lesson> getInstructorsLessons(
+            @PathVariable String id,
+            @RequestParam("since") Optional<String> since,
+            @RequestParam("from") Optional<String> from,
+            @RequestParam("to") Optional<String> to) {
+
+        if (since.isPresent()) {
+            Calendar sinceCal = Utils.parseISOString(since.get());
+            return lessonService.getLessonsByInstructorSince(
+                    id,
+                    sinceCal
+            );
+        } else if(from.isPresent() && to.isPresent()) {
+            Calendar fromCal = Utils.parseISOString(from.get());
+            Calendar toCal = Utils.parseISOString(to.get());
+            return lessonService.getLessonsByInstructorRange(
+                    id,
+                    fromCal,
+                    toCal
+            );
+        } else {
+            return lessonService.getLessonsByInstructor(id);
+        }
     }
 
     // create lesson - instructors are allowed to create lessons only for themselves

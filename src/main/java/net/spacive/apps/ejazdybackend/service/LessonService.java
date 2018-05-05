@@ -76,6 +76,30 @@ public class LessonService {
         return dynamoDao.getLessonsByInstructor(instructorId);
     }
 
+    public List<Lesson> getLessonsByInstructorSince(String instructorId, Calendar since) {
+        return dynamoDao.getLessonsByInstructorSince(instructorId, since);
+    }
+
+    public List<Lesson> getLessonsByStudentSince(String studentId, Calendar since) {
+        return dynamoDao.getLessonsByStudentSince(studentId, since);
+    }
+
+    public List<Lesson> getLessonsByInstructorRange(
+            String instructorId,
+            Calendar from,
+            Calendar to) {
+
+        return dynamoDao.getLessonsByInstructorRange(instructorId, from, to);
+    }
+
+    public List<Lesson> getLessonsByStudentRange(
+            String studentId,
+            Calendar from,
+            Calendar to) {
+
+        return dynamoDao.getLessonsByStudentRange(studentId, from, to);
+    }
+
     public Lesson deleteLesson(String instructorId, Calendar startTime) {
         Lesson toDelete = new Lesson()
                 .withInstructorId(instructorId)
