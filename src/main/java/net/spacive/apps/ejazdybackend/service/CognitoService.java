@@ -4,6 +4,7 @@ import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProvider;
 import com.amazonaws.services.cognitoidp.model.*;
 import net.spacive.apps.ejazdybackend.config.CognitoConfiguration;
 import net.spacive.apps.ejazdybackend.model.CognitoUser;
+import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,19 @@ public class CognitoService {
 
         AdminCreateUserResult result = cognito.adminCreateUser(request);
         return userTypeToCognitoUser(result.getUser(), null);
+    }
+
+    public CognitoUser deleteUser(CognitoUser user) {
+        AdminDeleteUserRequest request = new AdminDeleteUserRequest()
+                .withUsername(user.getEmail())
+                .withUserPoolId(config.getPoolId());
+
+        AdminDeleteUserResult result = cognito.adminDeleteUser(request);
+        if (result.getSdkHttpMetadata().getHttpStatusCode() == HttpStatus.SC_OK) {
+            return user;
+        } else {
+            return null;
+        }
     }
 
     public CognitoUser addUserToGroup(CognitoUser cognitoUser, String group) {

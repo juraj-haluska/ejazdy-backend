@@ -43,6 +43,12 @@ public class StudentController {
         return userService.inviteNewStudentByEmail(email);
     }
 
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public CognitoUser deleteStudent(@PathVariable String id) {
+        return userService.deleteStudent(id);
+    }
+
     // get single student by UUID
     @GetMapping("/{id}")
     public CognitoUser getStudent(@PathVariable String id) {

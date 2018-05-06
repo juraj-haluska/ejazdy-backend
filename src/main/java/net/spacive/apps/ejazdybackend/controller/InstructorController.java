@@ -43,6 +43,12 @@ public class InstructorController {
         return userService.inviteNewInstructorByEmail(email);
     }
 
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public CognitoUser deleteInstructor(@PathVariable String id) {
+        return userService.deleteInstructor(id);
+    }
+
     // get single instructor by UUID
     // accessible by every role
     @GetMapping("/{id}")
@@ -218,5 +224,4 @@ public class InstructorController {
                 false
         );
     }
-
 }
