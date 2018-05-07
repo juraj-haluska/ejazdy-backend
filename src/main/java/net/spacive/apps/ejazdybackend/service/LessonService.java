@@ -14,6 +14,8 @@ public class LessonService {
 
     private final DynamoDao dynamoDao;
 
+    private final static long dayInMilis = 86400000;
+
     @Autowired
     public LessonService(DynamoDao dynamoDao) {
         this.dynamoDao = dynamoDao;
@@ -48,16 +50,31 @@ public class LessonService {
             dynamoDao.updateLesson(fetchedLesson, true);
             return fetchedLesson;
         } else {
-            throw new Exception("lesson is already registered to another student");
+            throw new Exception("lesson is already registered to another student: "
+                + fetchedLesson.getStudentId() + "/" + fetchedLesson.getStudentName()
+            );
         }
     }
 
     // no foce mode - this method will delete student from lesson if this student
     // is actually registered to it.
-    // force mode - delete any student from specified lesson
-    // TODO: disable unregistration in no force mode within 24h prior to lesson beginning
+    // force mode - delete any student from specified lesson and ignore 24h before lesson
     public Lesson unregisterStudentFromLesson(String studentId, String instructorId, Calendar startTime, boolean force) throws Exception {
         Lesson fetchedLesson = dynamoDao.getLessonByInstructor(instructorId, startTime);
+
+        // 24 hours before lesson begins
+        Calendar actual = Calendar.getInstance();    // actual time
+        Calendar shift24 = (Calendar) fetchedLesson.getStartTime().clone();
+        shift24.setTimeInMillis(
+                // shift lesson start - 24h
+                shift24.getTimeInMillis() - dayInMilis
+        );
+
+        if (actual.after(shift24) && !force) {
+            // disable unregistration
+            return fetchedLesson;
+        }
+
         if (fetchedLesson.getStudentId().equals(studentId) || force) {
             fetchedLesson.setStudentId(null);
             fetchedLesson.setStudentName(null);
