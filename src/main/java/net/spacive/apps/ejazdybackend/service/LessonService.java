@@ -15,6 +15,7 @@ public class LessonService {
     private final DynamoDao dynamoDao;
 
     private final static long dayInMilis = 86400000;
+    private final static double milisToHoursRat = 3600000;
 
     @Autowired
     public LessonService(DynamoDao dynamoDao) {
@@ -124,5 +125,32 @@ public class LessonService {
 
         dynamoDao.deleteLesson(toDelete);
         return toDelete;
+    }
+
+    public Double getHoursCompletedByStudent(String studentId) {
+
+        Calendar from = Calendar.getInstance();
+        from.setTimeInMillis(0);
+
+        List<Lesson> lessons = getLessonsByStudentRange(
+                studentId,
+                from,
+                Calendar.getInstance()
+        );
+
+        long milisTotal = 0;
+
+        // sum up durations of lessons in miliseconds
+        for (Lesson l: lessons) {
+            long start = l.getStartTime().getTimeInMillis();
+            long stop = l.getStopTime().getTimeInMillis();
+
+            if (stop > start) {
+                milisTotal += stop - start;
+            }
+        }
+
+        // convert to hours
+        return milisTotal / milisToHoursRat;
     }
 }

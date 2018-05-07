@@ -50,6 +50,8 @@ public class StudentController {
     }
 
     // get single student by UUID
+    // admin, instructor - no restrictons
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_INSTRUCTOR')")
     @GetMapping("/{id}")
     public CognitoUser getStudent(@PathVariable String id) {
         return userService.getUser(id);
@@ -102,5 +104,11 @@ public class StudentController {
                 from,
                 to
         );
+    }
+
+   // every role can access
+    @GetMapping("/{id}/hours")
+    public Double getStudentHours(@PathVariable String id) {
+        return lessonService.getHoursCompletedByStudent(id);
     }
 }
