@@ -1,7 +1,6 @@
 package net.spacive.apps.ejazdybackend.controller;
 
 import net.spacive.apps.ejazdybackend.model.CognitoUser;
-import net.spacive.apps.ejazdybackend.service.LessonService;
 import net.spacive.apps.ejazdybackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -16,12 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class MyProfileController {
 
     private final UserService userService;
-    private final LessonService lessonService;
 
     @Autowired
-    public MyProfileController(UserService userService, LessonService lessonService) {
+    public MyProfileController(UserService userService) {
         this.userService = userService;
-        this.lessonService = lessonService;
     }
 
     @GetMapping
