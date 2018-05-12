@@ -15,49 +15,104 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * REST API for instructors resource.
+ *
+ * @author  Juraj Haluska
+ */
 @RestController
 @CrossOrigin
 @RequestMapping("/instructors")
 public class InstructorController {
 
+    /**
+     * Instance of UserService.
+     */
     private final UserService userService;
+
+    /**
+     * Instance of LessonService.
+     */
     private final LessonService lessonService;
 
+    /**
+     * Constructor.
+     *
+     * @param userService injected param.
+     * @param lessonService injected param.
+     */
     @Autowired
     public InstructorController(UserService userService, LessonService lessonService) {
         this.userService = userService;
         this.lessonService = lessonService;
     }
 
-    // list all instructors
+    /**
+     * List all instructors.
+     *
+     * <p>Allowed only every role.
+     *
+     * @return list of instructors.
+     */
     @GetMapping
     public List<CognitoUser> getAllInstructors() {
         return userService.getAllInstructors();
     }
 
-    // invite new instructor by email
-    // cognito will handle this
+    /**
+     * Invite new instructor by email.
+     *
+     * <p>Allowed only for admin.
+     *
+     * @return new user instance.
+     */
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public CognitoUser inviteInstructor(@RequestParam("email") String email) {
         return userService.inviteNewInstructorByEmail(email);
     }
 
+    /**
+     * Delete instructor.
+     *
+     * <p>Allowed only for admin.
+     *
+     * @param id an unique id of instructor.
+     * @return instance of deleted instructor.
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public CognitoUser deleteInstructor(@PathVariable String id) {
         return userService.deleteInstructor(id);
     }
 
-    // get single instructor by UUID
-    // accessible by every role
+    /**
+     * Get single instructor by UUID.
+     *
+     * <p>Allowed for every role.
+     *
+     * @param id an unique id of instructor.
+     * @return instance of instructor.
+     */
     @GetMapping("/{id}")
     public CognitoUser getInstructor(@PathVariable String id) {
         return userService.getUser(id);
     }
 
-    // get lessons of instructor specified by id
-    // accessible by every role
+    /**
+     * List lessons of instructor.
+     *
+     * <p>When since is used, from and to cannot be used too.
+     * From and to have to be used together.
+     *
+     * <p>Allowed for every role.
+     *
+     * @param id id an unique id of instructor.
+     * @param since optional date since.
+     * @param from optional date from.
+     * @param to optional date to.
+     * @return list of lessons.
+     */
     @GetMapping("/{id}/lessons")
     public List<Lesson> getInstructorsLessons(
             @PathVariable String id,
@@ -84,7 +139,19 @@ public class InstructorController {
         }
     }
 
-    // create lesson - instructors are allowed to create lessons only for themselves
+    /**
+     * Create new lesson.
+     *
+     * <p>Instructors are allowed to create lessons only for themselves.
+     *
+     * <p>Accessible only by instructor.
+     *
+     * @param id id of instructor.
+     * @param lesson lesson to create.
+     * @param auth security object containing principal.
+     * @return new lesson.
+     * @throws Exception if id in lesson is not same as id of calling instructor.
+     */
     @PostMapping("/{id}/lessons")
     @PreAuthorize("hasRole('ROLE_INSTRUCTOR')")
     public Lesson createLesson(
@@ -103,8 +170,18 @@ public class InstructorController {
         }
     }
 
-    // delete lesson - admin without restrictions, instructor may
-    // delete only his own lessons
+    /**
+     * Delete lesson.
+     *
+     * <p>Admin without restrictions, instructor may
+     * delete only his own lessons.
+     *
+     * @param id unique id of instructor.
+     * @param startTime unique start time for specified instructor.
+     * @param auth security object which contains principal.
+     * @return deleted lesson.
+     * @throws Exception if instructors id is wrong.
+     */
     @DeleteMapping("/{id}/lessons/{startTime}")
     @PreAuthorize("hasAnyRole('ROLE_INSTRUCTOR', 'ROLE_ADMIN')")
     public Lesson deleteLesson(
@@ -127,8 +204,18 @@ public class InstructorController {
         return lessonService.deleteLesson(id, Utils.parseISOString(startTime));
     }
 
-    // register student to lesson - admin no restrictions
-    // instructor only to himself
+    /**
+     * Register student to lesson.
+     *
+     * <p>Admin - no restrictons, instructor only to himself.
+     *
+     * @param id of instructor in lesson.
+     * @param startTime start time of lesson.
+     * @param studentId student who should be registered.
+     * @param auth security object which contains principal.
+     * @return updated lesson instance.
+     * @throws Exception if instructor id is wrong.
+     */
     @PostMapping("/{id}/lessons/{startTime}/student/{studentId}")
     @PreAuthorize("hasAnyRole('ROLE_INSTRUCTOR', 'ROLE_ADMIN')")
     public Lesson addStudentToLesson(
@@ -158,8 +245,19 @@ public class InstructorController {
         );
     }
 
-    // register calling student to lesson
-    // id of calling student is extracted from jwt
+    /**
+     * Register calling student to lesson.
+     *
+     * <p>Id of calling student is extracted from jwt.
+     *
+     * <p>Allowed only to student.
+     *
+     * @param id id of instructor.
+     * @param startTime start time.
+     * @param auth security object which contains principal.
+     * @return updated lesson.
+     * @throws Exception if deleting wrong lesson.
+     */
     @PostMapping("/{id}/lessons/{startTime}/student/me")
     @PreAuthorize("hasRole('ROLE_STUDENT')")
     public Lesson addInvokingStudentToLesson(
@@ -177,8 +275,17 @@ public class InstructorController {
         );
     }
 
-    // admin - no restrictions
-    // instructor - only his students
+    /**
+     * Delete student from lesson.
+     *
+     * <p>Admin - no restrictions, instructor - only his student.
+     * @param id id of instructor.
+     * @param startTime starting time of lesson.
+     * @param studentId id of student to be removed.
+     * @param auth security object which contains principal.
+     * @return updated lesson.
+     * @throws Exception wrong instructor id.
+     */
     @DeleteMapping("/{id}/lessons/{startTime}/student/{studentId}")
     @PreAuthorize("hasAnyRole('ROLE_INSTRUCTOR', 'ROLE_ADMIN')")
     public Lesson deleteStudentFromLesson(
@@ -207,7 +314,15 @@ public class InstructorController {
         );
     }
 
-    // id of calling student is extracted from jwt
+    /**
+     * Delete invoking student from lesson.
+     *
+     * @param id id of instructor.s
+     * @param startTime start time.
+     * @param auth security object which contains principal.
+     * @return updated lesson.
+     * @throws Exception if deleting wrong lesson.
+     */
     @DeleteMapping("/{id}/lessons/{startTime}/student/me")
     @PreAuthorize("hasRole('ROLE_STUDENT')")
     public Lesson deleteInvokingStudentFromLesson(

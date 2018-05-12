@@ -14,50 +14,106 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * REST API for students resource.
+ *
+ * @author  Juraj Haluska
+ */
 @RestController
 @CrossOrigin
 @RequestMapping("/students")
 public class StudentController {
 
+    /**
+     * Instance of UserService.
+     */
     private final UserService userService;
+
+    /**
+     * Instance of LessonService.
+     */
     private final LessonService lessonService;
 
+    /**
+     * Constructor.
+     *
+     * @param userService injected param.
+     * @param lessonService injected param.
+     */
     @Autowired
     public StudentController(UserService userService, LessonService lessonService) {
         this.userService = userService;
         this.lessonService = lessonService;
     }
 
-    // list all students
+    /**
+     * List all students.
+     *
+     * <p>Allowed only for instructor and admin.
+     *
+     * @return list of students.
+     */
     @GetMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_INSTRUCTOR')")
     public List<CognitoUser> getAllStudents() {
         return userService.getAllStudents();
     }
 
-    // invite new student by email
-    // cognito will handle this
+    /**
+     * Invite new student by email.
+     *
+     * <p>Allowed only for admin.
+     *
+     * @return new user instance.
+     */
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public CognitoUser inviteStudent(@RequestParam("email") String email) {
         return userService.inviteNewStudentByEmail(email);
     }
 
+    /**
+     * Delete student.
+     *
+     * <p>Allowed only for admin.
+     *
+     * @param id an unique id of student.
+     * @return instance of deleted student.
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public CognitoUser deleteStudent(@PathVariable String id) {
         return userService.deleteStudent(id);
     }
 
-    // get single student by UUID
-    // admin, instructor - no restrictons
+    /**
+     * Get single student by UUID.
+     *
+     * <p>Allowed only for admin and instructor.
+     *
+     * @param id an unique id of student.
+     * @return instance of student.
+     */
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_INSTRUCTOR')")
     @GetMapping("/{id}")
     public CognitoUser getStudent(@PathVariable String id) {
         return userService.getUser(id);
     }
 
-    // get lessons of student
+    /**
+     * List lessons of student.
+     *
+     * <p>When since is used, from and to cannot be used too.
+     * From and to have to be used together.
+     *
+     * <p>Allowed only for admin and instructor.
+     *
+     * @param id id an unique id of student.
+     * @param since optional date since.
+     * @param from optional date from.
+     * @param to optional date to.
+     * @return list of lessons.
+     */
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_INSTRUCTOR')")
     @GetMapping("/{id}/lessons")
     public List<Lesson> getLessonsByStudent(
@@ -85,8 +141,20 @@ public class StudentController {
         }
     }
 
-    // "me" path is used because we can avoid processing user roles
-    // inside controller methods
+    /**
+     * Get lessons by invoking student.
+     *
+     * <p>"me" path is used because we can avoid processing user roles
+     * inside controller methods.
+     *
+     * <p>Allowed only for student.
+     *
+     * @param auth object which contains principal.
+     * @param since optional date since.
+     * @param from optional date from.
+     * @param to optional date to.
+     * @return list of lessons.
+     */
     @PreAuthorize("hasRole('ROLE_STUDENT')")
     @GetMapping("/me/lessons")
     public List<Lesson> getLessonsByMe(
@@ -106,7 +174,14 @@ public class StudentController {
         );
     }
 
-   // every role can access
+    /**
+     * Get number of hours of finished lessons by student.
+     *
+     * <p>Can be accessed by student, instructor, admin.
+     *
+     * @param id unique id of student.
+     * @return number of hours.
+     */
     @GetMapping("/{id}/hours")
     public Double getStudentHours(@PathVariable String id) {
         return lessonService.getHoursCompletedByStudent(id);
