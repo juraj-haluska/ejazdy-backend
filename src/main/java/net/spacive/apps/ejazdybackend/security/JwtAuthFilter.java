@@ -29,18 +29,49 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class is spring boot filter implementation.
+ *
+ * <p>It is responsible for jwt verification and
+ * user authorization based on groups claim.
+ *
+ * @author  Juraj Haluska
+ */
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
+    /**
+     * HTTP Authorization header string.
+     */
     private static final String AUTH_HEADER_STRING = "Authorization";
+
+    /**
+     * HTTP Authorization schema.
+     */
     private static final String AUTH_BEARER_STRING = "Bearer";
+
+    /**
+     * Jwt attribute key for groups.
+     */
     private static final String COGNITO_GROUP_CLAIM = "cognito:groups";
 
+    /**
+     * Cognito configuration properties.
+     */
     private CognitoConfiguration properties;
 
-    // should cache keys
+    /**
+     * cached key set from @see nimbusds.
+     */
     private RemoteJWKSet remoteJWKSet;
 
+
+    /**
+     * Constructor.
+     *
+     * @param properties injected CognitoConfiguration.
+     * @throws MalformedURLException if url of key store is invalid.
+     */
     @Autowired
     public JwtAuthFilter(CognitoConfiguration properties) throws MalformedURLException {
         URL JWKUrl = new URL(properties.getIssuer() + properties.getKeyStorePath());
@@ -48,6 +79,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         this.properties = properties;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void doFilterInternal(
             HttpServletRequest req,
