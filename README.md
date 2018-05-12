@@ -1,7 +1,7 @@
 # EjazdyBackend
 
 Backend v Spring Boote ku semestrálnej práci eJazdy. Frontend
-a inštrukcie na spustenie frontendu sa nachádzajú v repozitári ejazdy-frontend.
+a inštrukcie na spustenie frontendu sa nachádzajú v repozitári [ejazdy-frontend](https://github.com/spacive/ejazdy-frontend).
 
 ## Popis semestrálnej práce
 
@@ -25,11 +25,11 @@ jazdy, ktoré boli vypísané inštruktorom.
 ### Demo
 
 Aplikáciu je možné odkúšať tu: http://ejazdy.sk.
-Na prihlásenie do aplikácie použite účty vypísané v README.md v repozitári ejazdy-frontend.
+Na prihlásenie do aplikácie použite účty vypísané v [README.md](https://github.com/spacive/ejazdy-frontend/blob/master/README.md) v repozitári [ejazdy-frontend](https://github.com/spacive/ejazdy-frontend).
 
 ### Dokumentácia
 
-Dokumentácia sa nachádza v priečinku docs.
+Dokumentácia sa nachádza v priečinku [docs](https://github.com/spacive/ejazdy-backend/tree/master/docs).
 
 ## Build a spustenie
 
