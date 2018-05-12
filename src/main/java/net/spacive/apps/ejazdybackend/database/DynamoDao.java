@@ -16,16 +16,38 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * This class is an implementation of database access object
+ * for AWS service - DynamoDB.
+ *
+ * <p>This class manipulates mainly with Lesson.
+ *
+ * @author  Juraj Haluska
+ * @see Lesson
+ */
 @Repository
 public class DynamoDao {
 
+    /**
+     * reference to dynamo db mapper provided by AWS SDK.
+     */
     private final DynamoDBMapper dbMapper;
 
+    /**
+     * Constructor.
+     * @param dbMapper injected param.
+     */
     @Autowired
     public DynamoDao(DynamoDBMapper dbMapper) {
         this.dbMapper = dbMapper;
     }
 
+    /**
+     * Get list of lessons by instructor.
+     *
+     * @param instructorId an unique id of instructor.
+     * @return list of lessons.
+     */
     public List<Lesson> getLessonsByInstructor(String instructorId) {
         checkValidId(instructorId);
 
@@ -38,6 +60,13 @@ public class DynamoDao {
         return dbMapper.query(Lesson.class, queryExpression);
     }
 
+    /**
+     * Get list of lessons by instructor since date.
+     *
+     * @param instructorId an unique id of instructor.
+     * @param since the date since which the lessons should be fetched.
+     * @return list of lessons.
+     */
     public List<Lesson> getLessonsByInstructorSince(
             String instructorId,
             Calendar since) {
@@ -62,6 +91,14 @@ public class DynamoDao {
         return dbMapper.query(Lesson.class, queryExpression);
     }
 
+    /**
+     * Get list of lessons within the date range by instructor.
+     *
+     * @param instructorId an unique id of instructor.
+     * @param from starting date.
+     * @param to ending date.
+     * @return list of lessons.
+     */
     public List<Lesson> getLessonsByInstructorRange(
             String instructorId,
             Calendar from,
@@ -90,6 +127,12 @@ public class DynamoDao {
         return dbMapper.query(Lesson.class, queryExpression);
     }
 
+    /**
+     * Get list of lessons by student.
+     *
+     * @param studentId an unique id of student.
+     * @return list of lessons.
+     */
     public List<Lesson> getLessonsByStudent(String studentId) {
         checkValidId(studentId);
 
@@ -103,6 +146,13 @@ public class DynamoDao {
         return dbMapper.query(Lesson.class, queryExpression);
     }
 
+    /**
+     * Get list of lessons by student since date.
+     *
+     * @param studentId an unique id of student.
+     * @param since the date since which the lessons should be fetched.
+     * @return list of lessons.
+     */
     public List<Lesson> getLessonsByStudentSince(
             String studentId,
             Calendar since) {
@@ -129,6 +179,14 @@ public class DynamoDao {
         return dbMapper.query(Lesson.class, queryExpression);
     }
 
+    /**
+     * Get list of lessons within the date range by student.
+     *
+     * @param studentId an unique id of student.
+     * @param from starting date.
+     * @param to ending date.
+     * @return list of lessons.
+     */
     public List<Lesson> getLessonsByStudentRange(
             String studentId,
             Calendar from,
@@ -159,6 +217,13 @@ public class DynamoDao {
         return dbMapper.query(Lesson.class, queryExpression);
     }
 
+    /**
+     * Get details of single lesson by instructor.
+     *
+     * @param instructorId an unique id of instructor.
+     * @param startTime start time of the lesson.
+     * @return lesson instance.
+     */
     public Lesson getLessonByInstructor(String instructorId, Calendar startTime) {
         checkValidId(instructorId);
 
@@ -186,6 +251,13 @@ public class DynamoDao {
         }
     }
 
+    /**
+     * Get details of single lesson by student.
+     *
+     * @param studentId an unique id of student.
+     * @param startTime start time of the lesson.
+     * @return lesson instance.
+     */
     public Lesson getLessonByStudent(String studentId, Calendar startTime) {
         checkValidId(studentId);
 
@@ -215,6 +287,15 @@ public class DynamoDao {
         }
     }
 
+    /**
+     * Create new lesson.
+     *
+     * <p>instructorId and startTime have to be present in
+     * lesson object passed as param.
+     *
+     * @param lesson lesson which should be created.
+     * @return true if lesson was created.
+     */
     public boolean createLesson(Lesson lesson) {
         Lesson exists = getLessonByInstructor(
                 lesson.getInstructorId(),
@@ -228,10 +309,24 @@ public class DynamoDao {
         return false;
     }
 
+    /**
+     * Delete lesson.
+     *
+     * @param lesson lesson which should be deleted.
+     */
     public void deleteLesson(Lesson lesson) {
         dbMapper.delete(lesson);
     }
 
+    /**
+     * Update lesson
+     *
+     * <p>if ignoreNullAttrs is true, corresponding null
+     * params in lesson will be unchanged.
+     *
+     * @param lesson lesson which should be updated.
+     * @param ignoreNullAttrs ignore null attributes.
+     */
     public void updateLesson(Lesson lesson, boolean ignoreNullAttrs) {
         DynamoDBMapperConfig.Builder config = DynamoDBMapperConfig.builder();
         if (ignoreNullAttrs) {
@@ -243,6 +338,14 @@ public class DynamoDao {
         dbMapper.save(lesson, config.build());
     }
 
+    /**
+     * Check format of id
+     *
+     * <p>If the format is invalid, method will cause
+     * runtime exception.
+     *
+     * @param id
+     */
     private void checkValidId(String id) {
         if (id == null) throw new IllegalArgumentException("ID cannot be null");
         if (id.length() == 0) throw new IllegalArgumentException("ID cannot be empty string");

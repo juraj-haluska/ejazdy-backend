@@ -2,18 +2,63 @@ package net.spacive.apps.ejazdybackend.model;
 
 import java.util.Date;
 
+/**
+ * This class is a POJO model for users in cognito.
+ *
+ * <p>This type is immutable.
+ *
+ * @author  Juraj Haluska
+ */
 public class CognitoUser {
 
+    /**
+     * Unique id of user.
+     */
     private String id;
+
+    /**
+     * Phone number of user.
+     */
     private String phone;
+
+    /**
+     * Email of user.
+     */
     private String email;
+
+    /**
+     * A group which user belongs to.
+     */
     private String userGroup;
+
+    /**
+     * Status of user - active, force_password_change.
+     */
     private String status;
+
+    /**
+     * First name of the user.
+     */
     private String firstName;
+
+    /**
+     * Last name of the user.
+     */
     private String lastName;
+
+    /**
+     * Date when the user was created.
+     */
     private Date createDate;
+
+    /**
+     * Last date when the user was modified.
+     */
     private Date lastModifiedDate;
 
+    /**
+     * Constructor.
+     */
     private CognitoUser() {
     }
 
@@ -53,6 +98,9 @@ public class CognitoUser {
         return lastModifiedDate;
     }
 
+    /**
+     * Builder for CognitoUser.
+     */
     public static final class Builder {
         private String id;
         private String phone;

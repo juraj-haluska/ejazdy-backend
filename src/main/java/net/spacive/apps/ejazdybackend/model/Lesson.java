@@ -5,14 +5,51 @@ import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import java.util.Calendar;
 import java.util.Objects;
 
+/**
+ * This class is a model of lesson in DynamoDB table Lesson.
+ *
+ * @author  Juraj Haluska
+ */
 @DynamoDBTable(tableName="Lesson")
 public class Lesson {
 
+    /**
+     * Unique id of an instructor which created this lesson.
+     *
+     * <p>This is the hash key in Lesson table.
+     */
     private String instructorId;
+
+    /**
+     * A time when this lesson starts.
+     *
+     * <p>Must be unique for specified instructor, because
+     * it is the range key.
+     *
+     * <p>In global secondary index StudentIdStartTime it is the range key too.
+     */
     private Calendar startTime;
+
+    /**
+     * A time when this lesson ends.
+     */
     private Calendar stopTime;
+
+    /**
+     * An unique id of registered student to this lesson.
+     *
+     * <p>This param is also a hash key of the index StudentIdStartTime.
+     */
     private String studentId;
+
+    /**
+     * Name of the instructor - used only in UI for viewing data.
+     */
     private String instructorName;
+
+    /**
+     * Name of the registered student - used only in UI for viewing data.
+     */
     private String studentName;
 
     @DynamoDBHashKey
@@ -99,6 +136,12 @@ public class Lesson {
         return this;
     }
 
+    /**
+     * Classic equals method.
+     *
+     * @param o object to compare
+     * @return is equal
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -112,6 +155,11 @@ public class Lesson {
                 Objects.equals(studentName, lesson.studentName);
     }
 
+    /**
+     * To string
+     *
+     * @return to string
+     */
     @Override
     public String toString() {
         return "Lesson{" +
