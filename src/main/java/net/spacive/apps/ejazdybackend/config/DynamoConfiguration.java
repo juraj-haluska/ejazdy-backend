@@ -9,12 +9,28 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+/**
+ * Configs related to DynamoDB service.
+ *
+ * @author  Juraj Haluska
+ */
 @Component
 @ConfigurationProperties(prefix = "dynamo")
 public class DynamoConfiguration {
 
+    /**
+     * AWS access key.
+     */
     private String accessKey;
+
+    /**
+     * AWS secret key.
+     */
     private String secretKey;
+
+    /**
+     * AWS region.
+     */
     private String region;
 
     public String getAccessKey() {
@@ -41,6 +57,12 @@ public class DynamoConfiguration {
         this.region = region;
     }
 
+    /**
+     * AmazonDynamoDB bean definition - this will allow us to
+     * use AmazonDynamoDB with DI.
+     *
+     * @return new dynamo client.
+     */
     @Bean
     public AmazonDynamoDB dynamoDB() {
 
@@ -57,6 +79,12 @@ public class DynamoConfiguration {
                 .build();
     }
 
+    /**
+     * DynamoDBMapper bean definition - this will allow us to
+     * use DynamoDBMapper with DI.
+     *
+     * @return new dynamo mapper.
+     */
     @Bean
     public DynamoDBMapper dynamoDBMapper() {
         return new DynamoDBMapper(dynamoDB());

@@ -11,16 +11,48 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+/**
+ * Configs related to Cognito service.
+ *
+ * @author  Juraj Haluska
+ */
 @Component
 @ConfigurationProperties(prefix = "cognito")
 public class CognitoConfiguration {
 
+    /**
+     * Id of user pool in cognito.
+     */
     private String poolId;
+
+    /**
+     * Issuer - name of the user pool.
+     */
     private String issuer;
+
+    /**
+     * Path to key store for validating jwts.
+     */
     private String keyStorePath;
+
+    /**
+     * Map of groups and corresponding roles.
+     */
     private Map<String, String> groupRole;
+
+    /**
+     * AWS access key
+     */
     private String accessKey;
+
+    /**
+     * AWS secret key.
+     */
     private String secretKey;
+
+    /**
+     * AWS region
+     */
     private String region;
 
     public String getPoolId() {
@@ -79,6 +111,12 @@ public class CognitoConfiguration {
         this.region = region;
     }
 
+    /**
+     * AWSCognitoIdentityProvider bean definition - this will allow us to
+     * use AWSCognitoIdentityProvider with DI.
+     *
+     * @return new identity provider client.
+     */
     @Bean
     public AWSCognitoIdentityProvider awsCognitoIdentityProvider() {
 
