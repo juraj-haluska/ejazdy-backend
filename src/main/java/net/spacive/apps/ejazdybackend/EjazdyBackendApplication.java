@@ -18,7 +18,6 @@ public class EjazdyBackendApplication {
 	/**
 	 * This is the entry point of application.
 	 * @param args Unused.
-	 * @return Nothing.
 	 */
 	public static void main(String[] args) {
 		SpringApplication.run(EjazdyBackendApplication.class, args);

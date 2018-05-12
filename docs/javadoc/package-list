@@ -1,0 +1,7 @@
+net.spacive.apps.ejazdybackend
+net.spacive.apps.ejazdybackend.config
+net.spacive.apps.ejazdybackend.controller
+net.spacive.apps.ejazdybackend.database
+net.spacive.apps.ejazdybackend.model
+net.spacive.apps.ejazdybackend.security
+net.spacive.apps.ejazdybackend.service

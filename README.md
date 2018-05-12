@@ -27,6 +27,10 @@ jazdy, ktoré boli vypísané inštruktorom.
 Aplikáciu je možné odkúšať tu: http://ejazdy.sk.
 Na prihlásenie do aplikácie použite účty vypísané v README.md v repozitári ejazdy-frontend.
 
+### Dokumentácia
+
+Dokumentácia sa nachádza v priečinku docs.
+
 ## Build a spustenie
 
 Požiadavky: maven

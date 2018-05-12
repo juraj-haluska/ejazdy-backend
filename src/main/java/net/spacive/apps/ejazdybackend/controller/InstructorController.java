@@ -64,6 +64,7 @@ public class InstructorController {
      *
      * <p>Allowed only for admin.
      *
+     * @param email email of student to invite
      * @return new user instance.
      */
     @PostMapping
