@@ -22,6 +22,11 @@ jazdy, ktoré boli vypísané inštruktorom.
 - Amazon DynamoDB
 - Angular
 
+### Demo
+
+Aplikáciu je možné odkúšať tu: http://ejazdy.sk.
+Na prihlásenie do aplikácie použite účty vypísané v README.md v repozitári ejazdy-frontend.
+
 ## Build a spustenie
 
 Požiadavky: maven
