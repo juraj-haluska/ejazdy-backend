@@ -9,14 +9,34 @@ import org.springframework.stereotype.Service;
 import java.util.Calendar;
 import java.util.List;
 
+/**
+ * This class is an implementation of the lesson service.
+ *
+ * @author  Juraj Haluska
+ */
 @Service
 public class LessonService {
 
+    /**
+     * Reference to DynamoDao.
+     */
     private final DynamoDao dynamoDao;
 
+    /**
+     * Respresents the lenght of the day in milliseconds.
+     */
     private final static long dayInMilis = 86400000;
+
+    /**
+     * Radio used for convesion between milliseconds and hours.
+     */
     private final static double milisToHoursRat = 3600000;
 
+    /**
+     * LessonService constructor.
+     *
+     * @param dynamoDao injected DynamoDao.
+     */
     @Autowired
     public LessonService(DynamoDao dynamoDao) {
         this.dynamoDao = dynamoDao;
@@ -39,7 +59,22 @@ public class LessonService {
         }
     }
 
-    // only if lesson is free
+    /**
+     * Register student to lesson.
+     *
+     * <p>Lessons are always owned by instructor and instructors
+     * id is used as hash key in DynamoDB. This is reason why
+     * instructorId must be passed.
+     *
+     * <p>Start time is the range key in DynamoDB and it must
+     * be unique among lessons of particular instructor.
+     *
+     * @param student an unique id of the student.
+     * @param instructorId an unique id of the instructor.
+     * @param startTime beginning time of the lesson.
+     * @return lesson instance to which the student was registered.
+     * @throws Exception if another student is already registered to it.
+     */
     public Lesson registerStudentToLesson(CognitoUser student, String instructorId, Calendar startTime) throws Exception {
         Lesson fetchedLesson = dynamoDao.getLessonByInstructor(instructorId, startTime);
 
@@ -57,9 +92,24 @@ public class LessonService {
         }
     }
 
-    // no foce mode - this method will delete student from lesson if this student
-    // is actually registered to it.
-    // force mode - delete any student from specified lesson and ignore 24h before lesson
+    /**
+     * Unregister student from lesson.
+     *
+     * <p>Force mode will delete any student from specified
+     * lesson and ignore 24h before lesson.
+     *
+     * <p>No force mode will delete student from lesson if this student
+     * is actually registered to it.
+     *
+     * <p>Start time is the range key in DynamoDB.
+     *
+     * @param studentId an unique id of the student.
+     * @param instructorId an unique id of the instructor.
+     * @param startTime beginning time of the lesson.
+     * @param force force delete mode.
+     * @return lesson instance from which the student was unregistered.
+     * @throws Exception (no force only) if the lesson specified belongs to another student.
+     */
     public Lesson unregisterStudentFromLesson(String studentId, String instructorId, Calendar startTime, boolean force) throws Exception {
         Lesson fetchedLesson = dynamoDao.getLessonByInstructor(instructorId, startTime);
 
@@ -86,22 +136,59 @@ public class LessonService {
         }
     }
 
+    /**
+     * List all lessons of specified student.
+     *
+     * @param studentId an unique id of the student.
+     * @return list of lessons.
+     */
     public List<Lesson> getLessonsByStudent(String studentId) {
         return dynamoDao.getLessonsByStudent(studentId);
     }
 
+    /**
+     * List all lessons of specified instructor.
+     *
+     * @param instructorId an unique id of the instructor.
+     * @return list of lessons.
+     */
     public List<Lesson> getLessonsByInstructor(String instructorId) {
         return dynamoDao.getLessonsByInstructor(instructorId);
     }
 
+    /**
+     * List lessons of specified instructor since
+     * specified date.
+     *
+     * @param instructorId an unique id of the instructor.
+     * @param since since when date.
+     * @return list of lessons.
+     */
     public List<Lesson> getLessonsByInstructorSince(String instructorId, Calendar since) {
         return dynamoDao.getLessonsByInstructorSince(instructorId, since);
     }
 
+    /**
+     * List lessons of specified student since
+     * specified date.
+     *
+     * @param studentId an unique id of the student.
+     * @param since since when date.
+     * @return list of lessons.
+     */
     public List<Lesson> getLessonsByStudentSince(String studentId, Calendar since) {
         return dynamoDao.getLessonsByStudentSince(studentId, since);
     }
 
+    /**
+     * List lessons of specified instructor within
+     * date range.
+     *
+     * @param instructorId an unique id of the instructor.
+     * @param from starting by date.
+     * @param to ending by date.
+     * @return list of lessons.
+     */
     public List<Lesson> getLessonsByInstructorRange(
             String instructorId,
             Calendar from,
@@ -110,6 +197,15 @@ public class LessonService {
         return dynamoDao.getLessonsByInstructorRange(instructorId, from, to);
     }
 
+    /**
+     * List lessons of specified student within
+     * date range.
+     *
+     * @param studentId an unique id of the student.
+     * @param from starting by date.
+     * @param to ending by date.
+     * @return list of lessons.
+     */
     public List<Lesson> getLessonsByStudentRange(
             String studentId,
             Calendar from,
@@ -118,6 +214,13 @@ public class LessonService {
         return dynamoDao.getLessonsByStudentRange(studentId, from, to);
     }
 
+    /**
+     * Permamently will delete lesson from the system.
+     *
+     * @param instructorId an unique id of the instructor.
+     * @param startTime startTime which is unique across instructors lessons.
+     * @return an instance of the deleted lesson.
+     */
     public Lesson deleteLesson(String instructorId, Calendar startTime) {
         Lesson toDelete = new Lesson()
                 .withInstructorId(instructorId)
@@ -127,6 +230,12 @@ public class LessonService {
         return toDelete;
     }
 
+    /**
+     * Get amount of completed hours by student.
+     *
+     * @param studentId an unique id of the student.
+     * @return amount of hours.
+     */
     public Double getHoursCompletedByStudent(String studentId) {
 
         Calendar from = Calendar.getInstance();

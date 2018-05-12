@@ -13,20 +13,45 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class is entry point of this application to
+ * AWS Cognito service.
+ *
+ * @author  Juraj Haluska
+ */
 @Service
 public class CognitoService {
 
     private static final Logger log = LoggerFactory.getLogger(CognitoService.class.getName());
 
+    /**
+     * Reference to AWSCognitoIdentityProvider.
+     */
     private final AWSCognitoIdentityProvider cognito;
+
+    /**
+     * Reference to CognitoConfiguration.
+     */
     private final CognitoConfiguration config;
 
+    /**
+     * CognitoService constructor.
+     *
+     * @param cognito injected cognito provider from AWS SDK.
+     * @param config cognito configuration POJO.
+     */
     @Autowired
     public CognitoService(AWSCognitoIdentityProvider cognito, CognitoConfiguration config) {
         this.cognito = cognito;
         this.config = config;
     }
 
+    /**
+     * List users in group.
+     *
+     * @param userGroup group name.
+     * @return list of users.
+     */
     public List<CognitoUser> getUsersInGroup(String userGroup) {
 
         ListUsersInGroupRequest request = new ListUsersInGroupRequest()
@@ -44,6 +69,12 @@ public class CognitoService {
         return cognitoUsers;
     }
 
+    /**
+     * Send an email invitation to user.
+     *
+     * @param email email of user which will be invited.
+     * @return an instance of new user.
+     */
     public CognitoUser inviteUser(String email) {
 
         final List<AttributeType> userAttributes = new ArrayList<>();
@@ -69,6 +100,11 @@ public class CognitoService {
         return userTypeToCognitoUser(result.getUser(), null);
     }
 
+    /**
+     * Delete user from user pool.
+     * @param user user to be deleted.
+     * @return deleted user instance.
+     */
     public CognitoUser deleteUser(CognitoUser user) {
         AdminDeleteUserRequest request = new AdminDeleteUserRequest()
                 .withUsername(user.getEmail())
@@ -82,6 +118,13 @@ public class CognitoService {
         }
     }
 
+    /**
+     * Add user to group.
+     *
+     * @param cognitoUser an instance of user.
+     * @param group name of the group.
+     * @return modified instance of cognitoUser with group.
+     */
     public CognitoUser addUserToGroup(CognitoUser cognitoUser, String group) {
 
         AdminAddUserToGroupRequest request = new AdminAddUserToGroupRequest()
@@ -104,6 +147,14 @@ public class CognitoService {
                 .build();
     }
 
+    /**
+     * Convertor between UserType which is AWS SDK implemenation
+     * and CognitoUser.
+     *
+     * @param user user returned by AWS SDK.
+     * @param userGroup name of the group.
+     * @return new instance of CognitoUser.
+     */
     private CognitoUser userTypeToCognitoUser(UserType user, String userGroup) {
         final CognitoUser.Builder builder = new CognitoUser.Builder();
 
@@ -145,6 +196,12 @@ public class CognitoService {
         return builder.build();
     }
 
+    /**
+     * Get user from cognito user pool.
+     *
+     * @param uuid an unique id of the user.
+     * @return an instance of the user.
+     */
     public CognitoUser getUser(String uuid) {
         ListUsersRequest request = new ListUsersRequest()
                 .withFilter(
